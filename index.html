@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Eid Mubarak Photo Booth 🌙</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================
+   EID MUBARAK PHOTO BOOTH — jewel-toned night sky theme
+   ===================================================== */
+:root {
+  --bg:    #061c14;
+  --surf:  #0c2e22;
+  --surf2: #0a2018;
+  --gold:  #f5c540;
+  --gold2: #c8880c;
+  --teal:  #18c8a0;
+  --teal2: #0d8c70;
+  --lamp:  #e8783a;
+  --cream: #fffaee;
+  --text:  #f0f8ee;
+  --dim:   #4a8068;
+  --rd:    #e04848;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { width:100%; height:100%; background:var(--bg); font-family:'Nunito',sans-serif; color:var(--text); overflow:hidden; }
+
+/* ── ANIMATED STAR FIELD ── */
+#starfield { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.sf-star {
+  position:absolute; font-size:14px;
+  animation:sftwink linear infinite;
+  opacity:.2;
+}
+@keyframes sftwink {
+  0%,100% { opacity:.12; transform:scale(.85); }
+  50%     { opacity:.5;  transform:scale(1.15); }
+}
+
+/* ── MAIN APP ── */
+#app { display:flex; flex-direction:column; height:100dvh; position:relative; z-index:1; }
+
+/* ── HEADER ── */
+header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px 8px;
+  background:var(--surf);
+  border-bottom:2px solid var(--gold2);
+  flex-shrink:0;
+}
+.logo {
+  display:flex; align-items:center; gap:8px;
+}
+.logo-text { line-height:1; }
+.logo-main {
+  font-family:'Fredoka One',sans-serif; font-size:22px;
+  color:var(--gold); display:block;
+}
+.logo-sub {
+  font-size:9px; color:var(--teal); letter-spacing:2px;
+  text-transform:uppercase; font-weight:800; display:block;
+  margin-top:1px;
+}
+.logo-moon { font-size:28px; animation:mfloat 5s ease-in-out infinite; }
+@keyframes mfloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+
+.shots-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+.shots-label { font-size:8px; color:var(--dim); letter-spacing:1.5px; text-transform:uppercase; font-weight:800; }
+.dots { display:flex; gap:6px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#163028; transition:all .3s; }
+.dot.lit  { background:var(--gold); transform:scale(1.25); box-shadow:0 0 8px var(--gold); }
+.dot.live { background:var(--gold); box-shadow:0 0 12px var(--gold); animation:dblink .65s infinite; }
+@keyframes dblink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* ── VIEWFINDER ── */
+#vf { flex:1; position:relative; overflow:hidden; background:#000; }
+#vid {
+  width:100%; height:100%; object-fit:cover; display:block;
+  transform:scaleX(-1);
+}
+#vid.f-sunny    { filter:none; }
+#vid.f-moon     { filter:grayscale(1) contrast(1.1); }
+#vid.f-golden   { filter:sepia(.45) saturate(1.35) brightness(1.06); }
+#vid.f-twilight { filter:hue-rotate(195deg) saturate(.9) brightness(1.04); }
+#vid.f-vintage  { filter:sepia(.65) contrast(.88) brightness(.94) saturate(.75); }
+#vid.f-festival { filter:contrast(1.45) saturate(1.4) brightness(.88); }
+
+#vig {
+  position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 44%, rgba(6,28,20,.72) 100%);
+}
+
+/* Gold corner ornaments */
+.orn {
+  position:absolute; z-index:3; pointer-events:none;
+  font-size:22px; opacity:.65;
+  animation:ofloat 4s ease-in-out infinite;
+}
+.orn.tl { top:10px; left:10px; animation-delay:0s; }
+.orn.tr { top:10px; right:10px; animation-delay:1s; }
+.orn.bl { bottom:10px; left:10px; animation-delay:2s; }
+.orn.br { bottom:10px; right:10px; animation-delay:.5s; }
+@keyframes ofloat { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+
+/* Countdown */
+#cdown {
+  position:absolute; inset:0; z-index:10;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .15s;
+  background:rgba(6,20,14,.35);
+}
+#cdown.show { opacity:1; }
+#cnum {
+  font-family:'Fredoka One',sans-serif; font-size:200px; line-height:1;
+  color:var(--gold);
+  text-shadow:0 0 70px rgba(245,197,64,.65), 0 4px 24px rgba(0,0,0,.85);
+}
+#cnum.pop { animation:cpop .88s ease-out; }
+@keyframes cpop {
+  0%  { transform:scale(1.9) rotate(-8deg); opacity:0; }
+  38% { transform:scale(1)   rotate(2deg);  opacity:1; }
+  100%{ transform:scale(.72) rotate(0deg);  opacity:.45; }
+}
+.cdown-stars { font-size:32px; display:flex; gap:12px; margin-top:6px; }
+.cdown-stars span { animation:spin 2s linear infinite; display:inline-block; }
+.cdown-stars span:nth-child(2) { animation-direction:reverse; animation-duration:1.5s; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* Flash */
+#flash { position:absolute; inset:0; z-index:20; background:#fffadc; opacity:0; pointer-events:none; }
+#flash.go { animation:fwh .5s ease-out forwards; }
+@keyframes fwh { 0%{opacity:.88} 100%{opacity:0} }
+
+/* ── FILTER BAR ── */
+#fbar {
+  display:flex; overflow-x:auto; flex-shrink:0;
+  background:var(--surf2); border-top:1px solid #0f3022;
+  scrollbar-width:none; padding:0 6px;
+}
+#fbar::-webkit-scrollbar { display:none; }
+.fb {
+  flex:0 0 auto; padding:7px 13px 6px;
+  font-family:'Nunito',sans-serif; font-weight:800; font-size:10px;
+  letter-spacing:.5px; text-transform:uppercase; color:var(--dim);
+  background:none; border:none; cursor:pointer;
+  position:relative; transition:color .2s;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+.fb .fi { font-size:15px; }
+.fb::after {
+  content:''; position:absolute; bottom:0; left:50%;
+  transform:translateX(-50%); height:2px; width:0;
+  background:var(--gold); transition:width .2s; border-radius:2px;
+}
+.fb.on { color:var(--gold); }
+.fb.on::after { width:80%; }
+
+/* ── CONTROLS ── */
+#ctrl {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 18px 14px;
+  background:var(--surf); border-top:2px solid var(--gold2);
+  flex-shrink:0; gap:12px;
+}
+.cbtn {
+  background:var(--surf2); border:1.5px solid #183c28;
+  color:var(--dim); cursor:pointer;
+  padding:8px 10px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .18s; font-size:11px; font-family:'Nunito',sans-serif; font-weight:800;
+}
+.cbtn svg { width:17px; height:17px; }
+.cbtn.on { border-color:var(--gold); color:var(--gold); }
+#flipbtn {
+  background:var(--surf2); border:1.5px solid #183c28; color:var(--dim);
+  cursor:pointer; padding:8px 10px; border-radius:10px;
+  font-size:22px; line-height:1; display:flex; align-items:center; justify-content:center;
+  transition:all .18s;
+}
+#shutbtn {
+  width:72px; height:72px; border-radius:50%;
+  background:radial-gradient(circle at 38% 35%, #ffdf70, var(--gold2));
+  border:3px solid rgba(255,255,255,.15);
+  cursor:pointer; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 0 3px var(--surf), 0 0 24px rgba(245,197,64,.4);
+  transition:transform .12s, box-shadow .2s;
+}
+#shutbtn:active { transform:scale(.89); }
+#shutbtn.busy { background:var(--surf2); box-shadow:0 0 0 3px var(--surf); cursor:not-allowed; }
+#shutbtn svg { width:28px; height:28px; fill:var(--surf); }
+.abtn {
+  background:none; border:1.5px solid #183c28; color:var(--dim); cursor:pointer;
+  padding:7px 11px; border-radius:10px;
+  font-family:'Nunito',sans-serif; font-size:10px; font-weight:800;
+  letter-spacing:.5px; text-transform:uppercase; white-space:nowrap; transition:all .18s;
+}
+.abtn.hi { border-color:var(--teal2); color:var(--teal); }
+
+/* ── DECORATE MODAL ── */
+#dec {
+  position:fixed; inset:0; z-index:50;
+  background:var(--bg);
+  display:none; flex-direction:column;
+  overflow:hidden;
+}
+#dec.open { display:flex; }
+
+#dec-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px 8px;
+  background:var(--surf); border-bottom:2px solid var(--gold2);
+  flex-shrink:0; gap:8px;
+}
+.dec-ht {
+  font-family:'Fredoka One',sans-serif; font-size:20px; color:var(--gold);
+  display:flex; align-items:center; gap:6px; flex:1;
+}
+.dec-hs { font-size:9px; color:var(--dim); font-weight:800; letter-spacing:1px; text-transform:uppercase; }
+.dec-layout { display:flex; gap:6px; align-items:center; }
+.dlbtn {
+  background:var(--surf2); border:1.5px solid #183c28; color:var(--dim);
+  cursor:pointer; padding:6px 8px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; transition:all .18s;
+}
+.dlbtn svg { width:15px; height:15px; }
+.dlbtn.on { border-color:var(--gold); color:var(--gold); }
+#dec-clear {
+  background:none; border:1.5px solid #3a1818; color:#c06050;
+  padding:6px 12px; border-radius:8px; cursor:pointer;
+  font-family:'Nunito',sans-serif; font-size:10px; font-weight:800; letter-spacing:.5px; text-transform:uppercase;
+}
+
+/* 2×2 photo grid */
+#dec-photos {
+  flex:1; display:grid; grid-template-columns:1fr 1fr;
+  gap:6px; padding:6px; overflow:hidden; min-height:0;
+}
+.dc {
+  position:relative; border-radius:10px; overflow:hidden; background:#000;
+  display:flex; align-items:stretch;
+}
+.dc canvas { width:100%; height:100%; display:block; object-fit:cover; border-radius:10px; }
+/* tap-ripple effect */
+.dc::after {
+  content:''; position:absolute; inset:0; border-radius:10px;
+  background:rgba(245,197,64,0); transition:background .3s;
+  pointer-events:none;
+}
+.dc.tapped::after { background:rgba(245,197,64,.18); }
+
+/* Sticker bar */
+#sbar {
+  flex-shrink:0; padding:7px 8px 6px;
+  background:var(--surf); border-top:2px solid var(--gold2);
+}
+.srow {
+  display:flex; gap:5px; overflow-x:auto;
+  padding-bottom:4px; scrollbar-width:none;
+}
+.srow::-webkit-scrollbar { display:none; }
+.srow + .srow { margin-top:5px; }
+.sk {
+  flex:0 0 auto; width:46px; height:46px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; border-radius:12px;
+  background:var(--surf2); border:1.5px solid #183c28;
+  cursor:pointer; user-select:none; -webkit-user-select:none;
+  transition:transform .1s, background .15s;
+}
+.sk:active { transform:scale(.75); background:#224838; }
+.sk.magic {
+  width:auto; padding:0 14px; font-size:13px; gap:4px;
+  font-family:'Fredoka One',sans-serif; color:var(--gold);
+  border-color:var(--gold2); letter-spacing:.5px;
+  background:linear-gradient(135deg,#1a3020,#0c2018);
+}
+.sk.magic:active { transform:scale(.93); }
+
+/* Decorate action buttons */
+#dec-actions {
+  display:flex; gap:10px; padding:8px 14px 12px;
+  background:var(--surf2); border-top:1px solid #0f3022; flex-shrink:0;
+}
+.da {
+  flex:1; padding:13px 8px; border-radius:14px; cursor:pointer;
+  font-family:'Fredoka One',sans-serif; font-size:18px; letter-spacing:.5px;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  transition:transform .12s;
+}
+.da:active { transform:scale(.95); }
+.da.retake { background:var(--surf2); border:1.5px solid #2a4838; color:var(--dim); }
+.da.save {
+  background:radial-gradient(circle at 38% 38%, #ffdf70, var(--gold2));
+  border:none; color:var(--surf);
+  box-shadow:0 4px 22px rgba(245,197,64,.38);
+}
+
+/* ── SAVED TOAST ── */
+#toast {
+  position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--teal2); color:#fff; padding:10px 24px; border-radius:50px;
+  font-family:'Fredoka One',sans-serif; font-size:16px; letter-spacing:.5px;
+  z-index:200; opacity:0; pointer-events:none; transition:all .3s; white-space:nowrap;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── SPLASH ── */
+#splash {
+  position:fixed; inset:0; z-index:100;
+  background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; padding:36px; text-align:center; overflow:hidden;
+}
+.sp-moon { font-size:88px; display:block; margin-bottom:4px; animation:mfloat 5s ease-in-out infinite; }
+.sp-h1 {
+  font-family:'Fredoka One',sans-serif; font-size:50px; color:var(--gold); line-height:1;
+  text-shadow:0 0 50px rgba(245,197,64,.45);
+}
+.sp-h2 { font-family:'Fredoka One',sans-serif; font-size:30px; color:var(--teal); line-height:1; }
+.sp-sub { font-size:12px; line-height:1.85; color:var(--dim); max-width:280px; margin-top:4px; }
+#gobtn {
+  margin-top:10px; padding:16px 56px;
+  background:radial-gradient(circle at 38% 38%, #ffdf70, var(--gold2));
+  color:var(--surf); border:none; cursor:pointer; border-radius:60px;
+  font-family:'Fredoka One',sans-serif; font-size:26px; letter-spacing:2px;
+  box-shadow:0 6px 30px rgba(245,197,64,.4);
+  transition:transform .12s, box-shadow .12s;
+}
+#gobtn:active { transform:scale(.95); }
+#gobtn:disabled { opacity:.4; cursor:not-allowed; }
+#errmsg {
+  font-size:11px; line-height:1.85; color:#c06030; max-width:300px; display:none;
+  border:1.5px solid #3a2010; background:#150e07; padding:12px 16px; border-radius:12px; text-align:left;
+}
+#errmsg.show { display:block; }
+/* Decorative scattered emojis on splash */
+.sp-deco { position:absolute; pointer-events:none; font-size:20px; opacity:.18; animation:sftwink linear infinite; }
+
+@media print {
+  body * { visibility:hidden !important; }
+  #printarea, #printarea * { visibility:visible !important; }
+  #printarea { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:white; }
+}
+#printarea { display:none; }
+</style>
+</head>
+<body>
+
+<!-- ── STAR FIELD ── -->
+<div id="starfield"></div>
+
+<!-- ── SPLASH ── -->
+<div id="splash">
+  <!-- scattered decorations -->
+  <span class="sp-deco" style="top:8%;left:6%;animation-duration:2.8s">⭐</span>
+  <span class="sp-deco" style="top:12%;right:8%;animation-duration:3.5s;font-size:28px">🌟</span>
+  <span class="sp-deco" style="top:30%;left:3%;animation-duration:4s">✨</span>
+  <span class="sp-deco" style="bottom:25%;right:5%;animation-duration:2.2s">⭐</span>
+  <span class="sp-deco" style="bottom:15%;left:8%;animation-duration:3.1s;font-size:26px">🌙</span>
+  <span class="sp-deco" style="top:20%;left:30%;animation-duration:4.4s">🌺</span>
+  <span class="sp-deco" style="bottom:30%;right:12%;animation-duration:3.8s">🪔</span>
+  <span class="sp-deco" style="top:60%;left:2%;animation-duration:2.6s;font-size:16px">✨</span>
+
+  <span class="sp-moon">🌙</span>
+  <h1 class="sp-h1">Eid Mubarak!</h1>
+  <h2 class="sp-h2">Photo Booth 📸</h2>
+  <p class="sp-sub">Take 4 fun photos, decorate with stickers, and save your memories! 🎉</p>
+  <button id="gobtn" onclick="startCam()">LET'S GO! ✨</button>
+  <div id="errmsg"></div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="app">
+  <header>
+    <div class="logo">
+      <span class="logo-moon">🌙</span>
+      <div class="logo-text">
+        <span class="logo-main">Eid Booth</span>
+        <span class="logo-sub">Photo Booth</span>
+      </div>
+    </div>
+    <div class="shots-wrap">
+      <span class="shots-label">Photos</span>
+      <div class="dots">
+        <div class="dot" id="d0"></div>
+        <div class="dot" id="d1"></div>
+        <div class="dot" id="d2"></div>
+        <div class="dot" id="d3"></div>
+      </div>
+    </div>
+  </header>
+
+  <div id="vf">
+    <video id="vid" autoplay playsinline muted class="f-sunny"></video>
+    <div id="vig"></div>
+    <div class="orn tl">⭐</div>
+    <div class="orn tr">🌙</div>
+    <div class="orn bl">✨</div>
+    <div class="orn br">⭐</div>
+    <div id="cdown">
+      <span id="cnum">3</span>
+      <div class="cdown-stars"><span>✨</span><span>⭐</span><span>✨</span></div>
+    </div>
+    <div id="flash"></div>
+  </div>
+
+  <div id="fbar">
+    <button class="fb on" data-f="sunny"    onclick="setF(this)"><span class="fi">☀️</span>Sunny</button>
+    <button class="fb"    data-f="moon"     onclick="setF(this)"><span class="fi">🌑</span>Moon</button>
+    <button class="fb"    data-f="golden"   onclick="setF(this)"><span class="fi">✨</span>Golden</button>
+    <button class="fb"    data-f="twilight" onclick="setF(this)"><span class="fi">🌊</span>Twilight</button>
+    <button class="fb"    data-f="vintage"  onclick="setF(this)"><span class="fi">📜</span>Classic</button>
+    <button class="fb"    data-f="festival" onclick="setF(this)"><span class="fi">🎆</span>Festival</button>
+  </div>
+
+  <div id="ctrl">
+    <div style="display:flex;gap:7px;align-items:center">
+      <button class="cbtn on" id="bstrip" onclick="setLayout('strip')" title="Strip">
+        <svg viewBox="0 0 16 20"><rect x="0" y="0" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="6" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="12" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="18" width="16" height="2" rx="1" fill="currentColor"/></svg>
+      </button>
+      <button class="cbtn" id="bgrid" onclick="setLayout('grid')" title="Grid">
+        <svg viewBox="0 0 18 18"><rect x="0" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="0" y="10" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="10" width="8" height="8" rx="1.5" fill="currentColor"/></svg>
+      </button>
+      <button id="flipbtn" onclick="flipCam()">&#8635;</button>
+    </div>
+
+    <button id="shutbtn" onclick="shoot()">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="5" fill="none" stroke="rgba(6,28,20,.5)" stroke-width="1.5"/></svg>
+    </button>
+
+    <div style="display:flex;flex-direction:column;gap:7px;align-items:flex-end">
+      <button class="abtn hi" id="viewbtn" onclick="openDecorate()" style="display:none">🎨 DECORATE</button>
+      <button class="abtn" onclick="resetAll()">RESET</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DECORATE MODAL ── -->
+<div id="dec">
+  <div id="dec-head">
+    <div style="display:flex;flex-direction:column;gap:1px">
+      <div class="dec-ht">🎨 Decorate!</div>
+      <div class="dec-hs">Tap stickers to decorate your photos</div>
+    </div>
+    <div class="dec-layout">
+      <button class="dlbtn on" id="dl-strip" onclick="setLayout('strip')" title="Strip">
+        <svg viewBox="0 0 16 20"><rect x="0" y="0" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="6" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="12" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="18" width="16" height="2" rx="1" fill="currentColor"/></svg>
+      </button>
+      <button class="dlbtn" id="dl-grid" onclick="setLayout('grid')" title="Grid">
+        <svg viewBox="0 0 18 18"><rect x="0" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="0" y="10" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="10" width="8" height="8" rx="1.5" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <button id="dec-clear" onclick="clearStickers()">🗑 CLEAR</button>
+  </div>
+
+  <div id="dec-photos">
+    <div class="dc"><canvas id="dc0"></canvas></div>
+    <div class="dc"><canvas id="dc1"></canvas></div>
+    <div class="dc"><canvas id="dc2"></canvas></div>
+    <div class="dc"><canvas id="dc3"></canvas></div>
+  </div>
+
+  <div id="sbar">
+    <!-- Row 1: Eid / Islamic -->
+    <div class="srow">
+      <button class="sk" onclick="addSticker('🌙')">🌙</button>
+      <button class="sk" onclick="addSticker('⭐')">⭐</button>
+      <button class="sk" onclick="addSticker('🌟')">🌟</button>
+      <button class="sk" onclick="addSticker('✨')">✨</button>
+      <button class="sk" onclick="addSticker('🕌')">🕌</button>
+      <button class="sk" onclick="addSticker('🪔')">🪔</button>
+      <button class="sk" onclick="addSticker('🌺')">🌺</button>
+      <button class="sk" onclick="addSticker('💫')">💫</button>
+      <button class="sk magic" onclick="surprise()">🎲 SURPRISE!</button>
+    </div>
+    <!-- Row 2: Fun / Kids / Celebration -->
+    <div class="srow">
+      <button class="sk" onclick="addSticker('🎉')">🎉</button>
+      <button class="sk" onclick="addSticker('🎊')">🎊</button>
+      <button class="sk" onclick="addSticker('🎈')">🎈</button>
+      <button class="sk" onclick="addSticker('👑')">👑</button>
+      <button class="sk" onclick="addSticker('🦋')">🦋</button>
+      <button class="sk" onclick="addSticker('🌈')">🌈</button>
+      <button class="sk" onclick="addSticker('🥳')">🥳</button>
+      <button class="sk" onclick="addSticker('🤩')">🤩</button>
+      <button class="sk" onclick="addSticker('😄')">😄</button>
+      <button class="sk" onclick="addSticker('🎁')">🎁</button>
+      <button class="sk" onclick="addSticker('🌸')">🌸</button>
+      <button class="sk" onclick="addSticker('🦄')">🦄</button>
+    </div>
+  </div>
+
+  <div id="dec-actions">
+    <button class="da retake" onclick="resetAll()">↩ RETAKE</button>
+    <button class="da save" onclick="saveStrip()">⬇ SAVE STRIP</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast">✅ Saved to Downloads!</div>
+
+<div id="printarea"></div>
+
+<script>
+// ─── State ───────────────────────────────────────────────
+var vid       = document.getElementById('vid');
+var flash     = document.getElementById('flash');
+var cdown     = document.getElementById('cdown');
+var cnum      = document.getElementById('cnum');
+var shutbtn   = document.getElementById('shutbtn');
+var viewbtn   = document.getElementById('viewbtn');
+var errmsg    = document.getElementById('errmsg');
+var gobtn     = document.getElementById('gobtn');
+var toast     = document.getElementById('toast');
+
+var myStream  = null;
+var facing    = 'user';
+var curFilter = 'sunny';
+var layout    = 'strip';
+var photos    = [];          // data URLs
+var layers    = [[],[],[],[]]; // sticker layers per photo
+var busy      = false;
+
+// Android Chrome: ctx.filter works on canvas ✓
+var CSS_FILTERS = {
+  'sunny':    'none',
+  'moon':     'grayscale(1) contrast(1.1)',
+  'golden':   'sepia(.45) saturate(1.35) brightness(1.06)',
+  'twilight': 'hue-rotate(195deg) saturate(.9) brightness(1.04)',
+  'vintage':  'sepia(.65) contrast(.88) brightness(.94) saturate(.75)',
+  'festival': 'contrast(1.45) saturate(1.4) brightness(.88)'
+};
+
+// ─── Starfield ───────────────────────────────────────────
+(function() {
+  var sf = document.getElementById('starfield');
+  var chars = ['⭐','🌟','✨','💫','⭐','✨'];
+  for (var i = 0; i < 18; i++) {
+    var s = document.createElement('span');
+    s.className = 'sf-star';
+    s.textContent = chars[i % chars.length];
+    s.style.left = (Math.random()*96) + '%';
+    s.style.top  = (Math.random()*96) + '%';
+    s.style.fontSize = (10 + Math.random()*14) + 'px';
+    s.style.animationDuration = (2.5 + Math.random()*4) + 's';
+    s.style.animationDelay    = (Math.random()*4) + 's';
+    sf.appendChild(s);
+  }
+})();
+
+// ─── Error / camera ──────────────────────────────────────
+function showErr(html) {
+  errmsg.innerHTML = html;
+  errmsg.classList.add('show');
+  gobtn.disabled = false;
+  gobtn.textContent = 'TRY AGAIN ✨';
+}
+
+function startCam() {
+  gobtn.disabled = true;
+  gobtn.textContent = 'STARTING...';
+  errmsg.classList.remove('show');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showErr('Camera not available.<br>Open this file in Chrome on your Samsung tablet.');
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: facing, width:{ideal:1920}, height:{ideal:1080} },
+    audio: false
+  }).then(function(s) {
+    myStream = s;
+    vid.srcObject = s;
+    vid.onloadedmetadata = function() {
+      vid.play();
+      document.getElementById('splash').style.display = 'none';
+    };
+    setTimeout(function(){ document.getElementById('splash').style.display = 'none'; }, 2000);
+  }).catch(function(err) {
+    var msgs = {
+      'NotAllowedError':  'Permission denied.<br>Tap the 🔒 icon in Chrome\'s address bar → Allow camera → Reload.',
+      'NotFoundError':    'No camera found on this device.',
+      'NotReadableError': 'Camera is in use by another app. Close it and try again.',
+      'SecurityError':    'Open this file directly in Chrome. Camera needs local file or https://.'
+    };
+    showErr(msgs[err.name] || err.name + ': ' + err.message);
+  });
+}
+
+// ─── Filter / Layout ─────────────────────────────────────
+function setF(btn) {
+  document.querySelectorAll('.fb').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  curFilter = btn.dataset.f;
+  vid.className = 'f-' + curFilter;
+}
+
+function setLayout(l) {
+  layout = l;
+  ['bstrip','bgrid'].forEach(function(id){
+    document.getElementById(id).classList.toggle('on', (id==='bstrip') === (l==='strip'));
+  });
+  ['dl-strip','dl-grid'].forEach(function(id){
+    document.getElementById(id).classList.toggle('on', (id==='dl-strip') === (l==='strip'));
+  });
+}
+
+function flipCam() {
+  facing = (facing === 'user') ? 'environment' : 'user';
+  vid.style.transform = (facing === 'user') ? 'scaleX(-1)' : 'scaleX(1)';
+  if (myStream) myStream.getTracks().forEach(function(t){ t.stop(); });
+  navigator.mediaDevices.getUserMedia({ video:{facingMode:facing}, audio:false })
+    .then(function(s){
+      myStream = s; vid.srcObject = s;
+      vid.onloadedmetadata = function(){ vid.play(); };
+    }).catch(function(e){ console.error('flip',e); });
+}
+
+// ─── Dots ────────────────────────────────────────────────
+function updateDots() {
+  for (var i = 0; i < 4; i++) {
+    var d = document.getElementById('d'+i);
+    d.className = 'dot';
+    if (i < photos.length)                d.classList.add('lit');
+    else if (i === photos.length && busy) d.classList.add('live');
+  }
+}
+
+// ─── Countdown ───────────────────────────────────────────
+function sleep(ms) { return new Promise(function(r){ setTimeout(r,ms); }); }
+
+function doCountdown() {
+  return new Promise(function(resolve) {
+    cdown.classList.add('show');
+    var n = 3;
+    function tick() {
+      cnum.textContent = n;
+      cnum.classList.remove('pop');
+      void cnum.offsetWidth;
+      cnum.classList.add('pop');
+      if (n <= 1) {
+        setTimeout(function(){ cdown.classList.remove('show'); resolve(); }, 880);
+        return;
+      }
+      n--;
+      setTimeout(tick, 960);
+    }
+    tick();
+  });
+}
+
+// ─── Capture ─────────────────────────────────────────────
+function grabFrame() {
+  return new Promise(function(resolve) {
+    flash.classList.remove('go');
+    void flash.offsetWidth;
+    flash.classList.add('go');
+
+    var w = vid.videoWidth, h = vid.videoHeight;
+    if (!w || !h) { resolve(null); return; }
+
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    var ctx = c.getContext('2d');
+
+    // Apply filter (Android Chrome supports ctx.filter)
+    ctx.filter = CSS_FILTERS[curFilter] || 'none';
+
+    if (facing === 'user') { ctx.translate(w,0); ctx.scale(-1,1); }
+    ctx.drawImage(vid, 0, 0, w, h);
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.filter = 'none';
+
+    // Vignette
+    var vg = ctx.createRadialGradient(w/2,h/2,h*.26,w/2,h/2,h*.72);
+    vg.addColorStop(0,'rgba(0,0,0,0)');
+    vg.addColorStop(1,'rgba(0,0,0,.44)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0,0,w,h);
+
+    // Film grain
+    var grain = ctx.createImageData(w,h);
+    for (var i = 0; i < grain.data.length; i+=4) {
+      var v = (Math.random()-.5)*22;
+      grain.data[i]=grain.data[i+1]=grain.data[i+2]=128+v;
+      grain.data[i+3]=12;
+    }
+    ctx.putImageData(grain,0,0);
+
+    try { resolve(c.toDataURL('image/jpeg', 0.92)); }
+    catch(e) { console.error(e); resolve(null); }
+  });
+}
+
+// ─── Shoot session ───────────────────────────────────────
+async function shoot() {
+  if (busy || !myStream) return;
+  if (photos.length >= 4) { openDecorate(); return; }
+
+  busy = true;
+  shutbtn.classList.add('busy');
+
+  while (photos.length < 4) {
+    updateDots();
+    await doCountdown();
+    var url = await grabFrame();
+    if (url) photos.push(url);
+    updateDots();
+    await sleep(380);
+  }
+
+  busy = false;
+  shutbtn.classList.remove('busy');
+  updateDots();
+  viewbtn.style.display = 'block';
+  openDecorate();
+}
+
+// ─── Decorate modal ──────────────────────────────────────
+var decCanvases = [
+  document.getElementById('dc0'),
+  document.getElementById('dc1'),
+  document.getElementById('dc2'),
+  document.getElementById('dc3')
+];
+
+function openDecorate() {
+  if (!photos.length) return;
+  document.getElementById('dec').classList.add('open');
+  // Small delay so layout is painted before we measure
+  setTimeout(function() {
+    for (var i = 0; i < photos.length; i++) renderCanvas(i);
+  }, 80);
+}
+
+function renderCanvas(idx) {
+  var c = decCanvases[idx];
+  if (!c || !photos[idx]) return;
+
+  // Size canvas to actual display pixels
+  var rect = c.parentElement.getBoundingClientRect();
+  var dpr  = window.devicePixelRatio || 1;
+  var cw   = Math.floor(rect.width  * dpr);
+  var ch   = Math.floor(rect.height * dpr);
+  if (cw < 2 || ch < 2) return;
+
+  c.width  = cw;
+  c.height = ch;
+
+  var ctx = c.getContext('2d');
+  var img = new Image();
+  img.onload = function() {
+    // cover-fit
+    var iw = img.naturalWidth, ih = img.naturalHeight;
+    var scale = Math.max(cw/iw, ch/ih);
+    var dw = iw*scale, dh = ih*scale;
+    ctx.drawImage(img, (cw-dw)/2, (ch-dh)/2, dw, dh);
+    drawStickers(ctx, idx, cw, ch);
+  };
+  img.src = photos[idx];
+}
+
+function drawStickers(ctx, idx, w, h) {
+  var stks = layers[idx];
+  for (var i = 0; i < stks.length; i++) {
+    var s = stks[i];
+    var x    = s.xf * w;
+    var y    = s.yf * h;
+    var size = s.sf * Math.min(w, h);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(s.r * Math.PI / 180);
+    ctx.font = size + 'px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s.e, 0, 0);
+    ctx.restore();
+  }
+}
+
+// ─── Stickers ────────────────────────────────────────────
+function addSticker(emoji) {
+  for (var i = 0; i < 4; i++) {
+    if (!photos[i]) continue;
+    layers[i].push({
+      e:  emoji,
+      xf: 0.1 + Math.random() * 0.8,
+      yf: 0.1 + Math.random() * 0.8,
+      sf: 0.08 + Math.random() * 0.09,
+      r:  (Math.random() - 0.5) * 52
+    });
+    renderCanvas(i);
+  }
+  // Tap ripple on all cells
+  document.querySelectorAll('.dc').forEach(function(el) {
+    el.classList.add('tapped');
+    setTimeout(function(){ el.classList.remove('tapped'); }, 320);
+  });
+}
+
+var ALL_STICKERS = ['🌙','⭐','🌟','✨','🕌','🪔','🌺','💫','🎉','🎊','🎈','👑','🦋','🌈','🥳','🤩','😄','🎁','🌸'];
+function surprise() {
+  var count = 3 + Math.floor(Math.random() * 4);
+  for (var s = 0; s < count; s++) {
+    var emoji = ALL_STICKERS[Math.floor(Math.random() * ALL_STICKERS.length)];
+    for (var i = 0; i < 4; i++) {
+      if (!photos[i]) continue;
+      layers[i].push({
+        e:  emoji,
+        xf: 0.08 + Math.random() * 0.84,
+        yf: 0.08 + Math.random() * 0.84,
+        sf: 0.07 + Math.random() * 0.1,
+        r:  (Math.random() - 0.5) * 60
+      });
+    }
+  }
+  for (var j = 0; j < 4; j++) renderCanvas(j);
+}
+
+function clearStickers() {
+  layers = [[],[],[],[]];
+  for (var i = 0; i < 4; i++) renderCanvas(i);
+}
+
+// ─── Save strip ──────────────────────────────────────────
+function saveStrip() {
+  if (!photos.length) return;
+  var isGrid = layout === 'grid';
+  var imgs = [], loaded = 0;
+  photos.forEach(function(url, i) {
+    var img = new Image();
+    img.onload = function() {
+      imgs[i] = img; loaded++;
+      if (loaded === photos.length) compose(imgs, isGrid);
+    };
+    img.src = url;
+  });
+}
+
+function compose(imgs, isGrid) {
+  var pad   = 48;
+  var gap   = 14;
+  var headH = 90;
+  var footH = 44;
+
+  var pw = imgs[0].naturalWidth;
+  var ph = imgs[0].naturalHeight;
+
+  var cols   = isGrid ? 2 : 1;
+  var rows   = isGrid ? 2 : 4;
+  var cellW  = isGrid ? Math.floor((1000 - pad*2 - gap) / 2) : 900 - pad*2;
+  var cellH  = Math.round(cellW * ph / pw);
+  var canW   = pad*2 + cellW*cols + gap*(cols-1);
+  var canH   = pad + headH + cellH*rows + gap*(rows-1) + footH + pad/2;
+
+  var c   = document.createElement('canvas');
+  c.width = canW; c.height = canH;
+  var ctx = c.getContext('2d');
+
+  // Paper background
+  ctx.fillStyle = '#fffaee';
+  ctx.fillRect(0,0,canW,canH);
+
+  // Subtle geometric dot pattern
+  ctx.fillStyle = 'rgba(245,197,64,.1)';
+  for (var gx = 20; gx < canW; gx += 32) {
+    for (var gy = 20; gy < canH; gy += 32) {
+      ctx.beginPath(); ctx.arc(gx,gy,2,0,Math.PI*2); ctx.fill();
+    }
+  }
+
+  // Top decorative border line
+  ctx.fillStyle = '#c8880c';
+  ctx.fillRect(0,0,canW,4);
+  ctx.fillRect(0,canH-4,canW,4);
+
+  // Title
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#061c14';
+  ctx.font = 'bold ' + Math.round(canW * 0.048) + 'px "Fredoka One", sans-serif';
+  ctx.fillText('🌙 Eid Mubarak! 🌙', canW/2, pad + Math.round(headH * 0.52));
+  ctx.font = Math.round(canW * 0.024) + 'px "Nunito", sans-serif';
+  ctx.fillStyle = '#4a8068';
+  ctx.fillText('Photo Booth Memories ✨', canW/2, pad + Math.round(headH * 0.82));
+
+  // Photos + stickers
+  imgs.forEach(function(img, i) {
+    var col = isGrid ? i % 2 : 0;
+    var row = isGrid ? Math.floor(i/2) : i;
+    var ox  = pad + col * (cellW + gap);
+    var oy  = pad + headH + row * (cellH + gap);
+
+    // Rounded rect clip for photo
+    ctx.save();
+    roundRect(ctx, ox, oy, cellW, cellH, 10);
+    ctx.clip();
+    ctx.drawImage(img, ox, oy, cellW, cellH);
+    ctx.restore();
+
+    // Thin border around photo
+    ctx.strokeStyle = 'rgba(200,136,12,.35)';
+    ctx.lineWidth = 2;
+    roundRect(ctx, ox, oy, cellW, cellH, 10);
+    ctx.stroke();
+
+    // Stickers on top of photo
+    layers[i].forEach(function(s) {
+      var sx   = ox + s.xf * cellW;
+      var sy   = oy + s.yf * cellH;
+      var size = s.sf * Math.min(cellW, cellH);
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(s.r * Math.PI / 180);
+      ctx.font = size + 'px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(s.e, 0, 0);
+      ctx.restore();
+    });
+  });
+
+  // Date
+  ctx.textAlign = 'center';
+  ctx.font = Math.round(canW * 0.018) + 'px "Nunito", sans-serif';
+  ctx.fillStyle = '#8aaa90';
+  var now = new Date();
+  ctx.fillText(
+    now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase(),
+    canW/2, canH - pad/2 - 6
+  );
+
+  // Download
+  var a = document.createElement('a');
+  a.download = 'eid-photo-booth-' + Date.now() + '.jpg';
+  a.href = c.toDataURL('image/jpeg', 0.93);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // Show toast
+  toast.classList.add('show');
+  setTimeout(function(){ toast.classList.remove('show'); }, 3000);
+}
+
+// Rounded rect path helper
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+// ─── Reset ───────────────────────────────────────────────
+function resetAll() {
+  photos = []; layers = [[],[],[],[]]; busy = false;
+  shutbtn.classList.remove('busy');
+  viewbtn.style.display = 'none';
+  updateDots();
+  document.getElementById('dec').classList.remove('open');
+}
+</script>
+</body>
+</html>
