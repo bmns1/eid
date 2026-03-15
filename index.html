@@ -674,7 +674,7 @@ function showStatus(type, title, body) {
       '<li>On your laptop, open a terminal in the folder with this file</li>' +
       '<li>Run: <code>python3 -m http.server 8080</code></li>' +
       '<li>Find your laptop\'s IP (e.g. <code>192.168.1.x</code>)</li>' +
-      '<li>On the tablet, open Chrome and go to:<br><code>http://192.168.1.x:8080/photobooth.html</code></li>' +
+      '<li>On the tablet, open Chrome and go to:<br><code>http://192.168.1.x:8080/index.html</code></li>' +
       '</ol>' +
       '</div>'
     );
@@ -791,7 +791,7 @@ function handleCamError(err) {
         '<div class="serve-tip">' +
         '<b>Quick fix:</b> Serve this file from your laptop:' +
         '<ol><li>Run: <code>python3 -m http.server 8080</code></li>' +
-        '<li>Open <code>http://YOUR_LAPTOP_IP:8080/photobooth.html</code> on the tablet</li></ol>' +
+        '<li>Open <code>http://YOUR_LAPTOP_IP:8080/index.html</code> on the tablet</li></ol>' +
         '</div>'
       );
       break;
