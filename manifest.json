@@ -2,7 +2,7 @@
   "name": "Eid Mubarak Photo Booth",
   "short_name": "Eid Booth",
   "description": "Fun photo booth for Eid celebrations!",
-  "start_url": "./photobooth.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#04120d",
