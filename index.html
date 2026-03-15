@@ -413,7 +413,7 @@ function saveStrip(){
   if(!photos.length)return;
   var c=document.createElement('canvas');c.width=1200;c.height=1800;
   draw46(c.getContext('2d'),1200,1800);
-  try{c.toBlob(function(blob){if(!blob)return;saveToGallery(blob,function(){toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},3000);});var u=URL.createObjectURL(blob);var a=document.createElement('a');a.download='eid-photo-'+Date.now()+'.jpg';a.href=u;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},2000);setTimeout(function(){resetAll();},800);},'image/jpeg',0.95);}catch(e){console.error(e);}
+  try{c.toBlob(function(blob){if(!blob)return;saveToGallery(blob,function(){toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},3000);});var u=URL.createObjectURL(blob);var a=document.createElement('a');a.download='eid-photo-'+Date.now()+'.jpg';a.href=u;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},2000);setTimeout(function(){goToSleep();},800);},'image/jpeg',0.95);}catch(e){console.error(e);}
 }
 
 // ─── IndexedDB ──────────────────────────────────────────
