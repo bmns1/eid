@@ -439,7 +439,7 @@ function stopFxLoop(){
 function flipCam(){facing=(facing==='user')?'environment':'user';vid.style.transform=(facing==='user')?'scaleX(-1)':'scaleX(1)';if(myStream)myStream.getTracks().forEach(function(t){t.stop();});navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false}).then(function(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play();};}).catch(function(e){console.error('flip',e);});}
 function updateDots(){for(var i=0;i<4;i++){var d=document.getElementById('d'+i);d.className='dot';if(i<photos.length)d.classList.add('lit');else if(i===photos.length&&busy)d.classList.add('live');}}
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
-function doCountdown(){var lbl=document.querySelector('.cdown-label'),msgs=['Say cheese! 🧀','Get ready! 📸','Strike a pose! 💃','Smile big! 😄'];return new Promise(function(res){cdown.classList.add('show');if(lbl)lbl.textContent=msgs[photos.length]||msgs[0];var n=3;function tick(){cnum.textContent=n;cnum.classList.remove('pop');void cnum.offsetWidth;cnum.classList.add('pop');if(n<=1){setTimeout(function(){cdown.classList.remove('show');res();},880);return;}n--;setTimeout(tick,960);}tick();});}
+function doCountdown(){var lbl=document.querySelector('.cdown-label'),msgs=['Say cheese! 🧀','Get ready! 📸','MashaAllah!','Smile big! 😄'];return new Promise(function(res){cdown.classList.add('show');if(lbl)lbl.textContent=msgs[photos.length]||msgs[0];var n=3;function tick(){cnum.textContent=n;cnum.classList.remove('pop');void cnum.offsetWidth;cnum.classList.add('pop');if(n<=1){setTimeout(function(){cdown.classList.remove('show');res();},880);return;}n--;setTimeout(tick,960);}tick();});}
 
 // Detect if ctx.filter is supported (Safari doesn't support it)
 var supportsCtxFilter=(function(){var tc=document.createElement('canvas').getContext('2d');tc.filter='brightness(1)';return tc.filter==='brightness(1)';}());
@@ -589,7 +589,7 @@ function draw46(ctx,W,H){
   // Date
   ctx.fillStyle='#c8880c';
   ctx.font='700 '+Math.round(W*.028)+'px "Baloo 2",sans-serif';
-  ctx.fillText('March 30, 2026',W/2,H*.113);
+  ctx.fillText('March 20, 2026',W/2,H*.113);
   // Divider
   ctx.fillStyle='#c8880c';rr(ctx,W*.07,H*.126,W*.86,Math.max(2,H*.002),1);ctx.fill();
   // Second deco row
@@ -619,7 +619,7 @@ function draw46(ctx,W,H){
   ctx.textAlign='center';ctx.fillStyle='#c8880c';ctx.font=Math.round(W*.02)+'px serif';
   ctx.fillText('🌙  ⭐  ✨  Eid Mubarak!  ✨  ⭐  🌙',W/2,H*.96);
   ctx.fillStyle='#8aaa90';ctx.font='600 '+Math.round(W*.015)+'px "Nunito",sans-serif';
-  ctx.fillText('Photo Booth Memories',W/2,H*.98);
+  ctx.fillText('Thanks for Comming!',W/2,H*.98);
 }
 
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
