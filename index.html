@@ -258,12 +258,43 @@ var vid=document.getElementById('vid'),flash=document.getElementById('flash'),cd
 var myStream=null,facing='user',curFilter='sunny',photos=[],layers=[[],[],[],[]],busy=false;
 var CSS_FILTERS={'sunny':'none','moon':'grayscale(1) contrast(1.1)','golden':'sepia(.45) saturate(1.35) brightness(1.06)','twilight':'hue-rotate(195deg) saturate(.9) brightness(1.04)','vintage':'sepia(.65) contrast(.88) brightness(.94) saturate(.75)','festival':'contrast(1.45) saturate(1.4) brightness(.88)'};
 
+// ─── Inactivity timer (2 min) — stops camera to save battery ──
+var IDLE_MS=2*60*1000;
+var idleTimer=null;
+function resetIdleTimer(){
+  if(idleTimer)clearTimeout(idleTimer);
+  // Only run timer when camera is active (splash hidden)
+  if(document.getElementById('splash').style.display==='none'){
+    idleTimer=setTimeout(goToSleep,IDLE_MS);
+  }
+}
+function goToSleep(){
+  // Stop camera
+  if(myStream){myStream.getTracks().forEach(function(t){t.stop();});myStream=null;}
+  vid.srcObject=null;
+  // Close any open modals
+  document.getElementById('dec').classList.remove('open');
+  document.getElementById('gallery').classList.remove('open');
+  document.getElementById('preview').classList.remove('open');
+  // Reset state
+  photos.forEach(function(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u);}catch(e){}});
+  photos=[];layers=[[],[],[],[]];photoImgs=[null,null,null,null];busy=false;
+  shutbtn.classList.remove('busy');viewbtn.style.display='none';updateDots();
+  // Show splash
+  document.getElementById('splash').style.display='';
+  gobtn.disabled=false;gobtn.textContent="LET'S GO! ✨";
+  statusCard.className='';statusCard.innerHTML='';
+}
+// Listen for any interaction to reset the timer
+['touchstart','click','pointerdown'].forEach(function(evt){
+  document.addEventListener(evt,resetIdleTimer,{passive:true,capture:true});
+});
 // Diagnostics
 function showStatus(t,title,body){statusCard.className='sc-'+t+' show';statusCard.id='status-card';statusCard.innerHTML='<div class="sc-inner"><div class="sc-title">'+title+'</div><div class="sc-body">'+body+'</div></div>';}
 (function(){if(location.protocol==='file:'){showStatus('warn','⚠️ Local File','<b>Chrome blocks camera on local files.</b><div class="serve-tip"><b>Fix:</b> Run <code>python3 -m http.server 8080</code> on laptop, open <code>http://LAPTOP_IP:8080</code> on tablet.</div>');gobtn.textContent='TRY ANYWAY ✨';}if(navigator.permissions&&navigator.permissions.query){navigator.permissions.query({name:'camera'}).then(function(r){if(r.state==='denied')showStatus('err','🚫 Camera Blocked','Tap 🔒 in address bar → Site settings → Camera → <b>Allow</b> → Reload.');r.onchange=function(){if(r.state==='granted'){statusCard.className='';statusCard.innerHTML='';gobtn.disabled=false;gobtn.textContent="LET'S GO! ✨";}};}).catch(function(){});}})();
 
 function startCam(){gobtn.disabled=true;gobtn.textContent='STARTING...';statusCard.className='';statusCard.innerHTML='';if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){showStatus('err','🚫 No Camera','Use <b>Chrome</b> on your tablet.');gobtn.disabled=false;gobtn.textContent='TRY AGAIN ✨';return;}navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1280},height:{ideal:720}},audio:false}).then(camOk).catch(function(e){if(e.name==='OverconstrainedError')return navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false}).then(camOk);throw e;}).catch(camFail);}
-function camOk(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play().then(function(){document.getElementById('splash').style.display='none';}).catch(function(){document.getElementById('splash').style.display='none';});};setTimeout(function(){document.getElementById('splash').style.display='none';},3000);}
+function camOk(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play().then(function(){document.getElementById('splash').style.display='none';resetIdleTimer();}).catch(function(){document.getElementById('splash').style.display='none';resetIdleTimer();});};setTimeout(function(){document.getElementById('splash').style.display='none';resetIdleTimer();},3000);}
 function camFail(e){gobtn.disabled=false;gobtn.textContent='TRY AGAIN ✨';var m={'NotAllowedError':['🚫 Permission Denied','Tap <b>🔒 lock icon</b> → Permissions → Camera → <b>Allow</b> → TRY AGAIN.'],'NotFoundError':['📷 No Camera','No camera detected.'],'NotReadableError':['⚠️ Camera Busy','Close other camera apps.'],'SecurityError':['🔒 Needs HTTPS','<div class="serve-tip">Run <code>python3 -m http.server 8080</code> on laptop.</div>']};var p=m[e.name];if(p)showStatus('err',p[0],p[1]);else showStatus('err','❌ Error','<b>'+e.name+'</b>: '+e.message);}
 
 function setF(b){document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');curFilter=b.dataset.f;vid.className='f-'+curFilter;}
