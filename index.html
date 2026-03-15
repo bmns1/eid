@@ -43,7 +43,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:6px
 /* ── VIEWFINDER — max space ── */
 #vf{flex:1;position:relative;overflow:hidden;background:#111}
 #vid{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}
-#vid.f-sunny{filter:none}#vid.f-moon{filter:grayscale(1) contrast(1.1)}#vid.f-golden{filter:sepia(.45) saturate(1.35) brightness(1.06)}#vid.f-twilight{filter:hue-rotate(195deg) saturate(.9) brightness(1.04)}#vid.f-vintage{filter:sepia(.65) contrast(.88) brightness(.94) saturate(.75)}#vid.f-festival{filter:contrast(1.45) saturate(1.4) brightness(.88)}
+#vid.f-sunny{filter:none}#vid.f-moon{filter:grayscale(1) contrast(1.1)}#vid.f-golden{filter:sepia(.45) saturate(1.35) brightness(1.06)}#vid.f-twilight{filter:hue-rotate(195deg) saturate(.9) brightness(1.04)}#vid.f-vintage{filter:sepia(.65) contrast(.88) brightness(.94) saturate(.75)}#vid.f-festival{filter:contrast(1.45) saturate(1.4) brightness(.88)}#vid.f-glow{filter:brightness(1.15) saturate(1.4) contrast(1.1)}#vid.f-invert{filter:invert(1) hue-rotate(180deg)}#vid.f-mirror{filter:none}#vid.f-pixel{filter:none}
 
 /* Countdown */
 #cdown{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;background:rgba(0,0,0,.3)}
@@ -101,6 +101,44 @@ header{display:flex;align-items:center;justify-content:space-between;padding:6px
 .da:active{transform:scale(.94)}
 .da.retake{background:var(--white);border:2px solid var(--border);color:var(--dim)}
 .da.save{background:radial-gradient(circle at 38% 38%,#ffdf70,var(--gold));color:#fff;box-shadow:0 4px 20px rgba(200,136,12,.3)}
+
+/* ── DRAW TOOLBAR ── */
+#draw-bar{flex-shrink:0;padding:6px 8px;background:var(--surf);border-top:2px solid var(--border);display:flex;align-items:center;gap:6px}
+#draw-toggle{
+  padding:10px 16px;border-radius:14px;cursor:pointer;border:2px solid var(--border);
+  font-family:'Baloo 2',sans-serif;font-size:15px;font-weight:700;
+  background:var(--white);color:var(--dim);transition:all .15s;display:flex;align-items:center;gap:5px;
+}
+#draw-toggle.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.draw-colors{display:flex;gap:5px;align-items:center}
+.dcolor{
+  width:36px;height:36px;border-radius:50%;cursor:pointer;border:3px solid transparent;
+  transition:transform .12s,border-color .15s;flex-shrink:0;
+}
+.dcolor:active{transform:scale(.85)}
+.dcolor.on{border-color:var(--text);transform:scale(1.15)}
+.draw-sizes{display:flex;gap:4px;align-items:center;margin-left:2px}
+.dsize{
+  border-radius:50%;background:var(--text);cursor:pointer;border:2px solid transparent;
+  transition:transform .12s;flex-shrink:0;
+}
+.dsize.on{border-color:var(--gold);transform:scale(1.2)}
+#draw-undo{
+  padding:8px 14px;border-radius:12px;cursor:pointer;border:2px solid var(--border);
+  font-family:'Baloo 2',sans-serif;font-size:14px;font-weight:700;
+  background:var(--white);color:var(--dim);margin-left:auto;transition:all .15s;
+}
+#draw-undo:active{transform:scale(.92)}
+#dec-preview-wrap{position:relative}
+#dec-preview{position:relative;z-index:1}
+.draw-hint{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:700;
+  color:rgba(0,0,0,.35);pointer-events:none;z-index:5;
+  background:rgba(255,255,255,.7);padding:8px 18px;border-radius:30px;
+  opacity:0;transition:opacity .3s;white-space:nowrap;
+}
+.draw-hint.show{opacity:1}
 
 /* ── TOAST ── */
 #toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;padding:16px 36px;border-radius:50px;font-family:'Baloo 2',sans-serif;font-size:22px;font-weight:700;z-index:200;opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.15)}
@@ -195,6 +233,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:6px
     <button class="fb" data-f="twilight" onclick="setF(this)"><span class="fi">🌊</span>Twilight</button>
     <button class="fb" data-f="vintage" onclick="setF(this)"><span class="fi">📜</span>Classic</button>
     <button class="fb" data-f="festival" onclick="setF(this)"><span class="fi">🎆</span>Festival</button>
+    <button class="fb" data-f="glow" onclick="setF(this)"><span class="fi">💡</span>Glow</button>
+    <button class="fb" data-f="invert" onclick="setF(this)"><span class="fi">🔮</span>Alien</button>
+    <button class="fb" data-f="mirror" onclick="setF(this)"><span class="fi">🪞</span>Mirror</button>
+    <button class="fb" data-f="pixel" onclick="setF(this)"><span class="fi">👾</span>Pixel</button>
   </div>
 
   <div id="ctrl">
@@ -215,10 +257,29 @@ header{display:flex;align-items:center;justify-content:space-between;padding:6px
 <div id="dec">
   <div id="dec-head">
     <div class="dec-ht">🎨 Decorate!</div>
-    <button id="dec-clear" onclick="clearStickers()">🗑 CLEAR</button>
+    <button id="dec-clear" onclick="clearAll()">🗑 CLEAR ALL</button>
   </div>
   <div id="dec-preview-wrap">
     <canvas id="dec-preview"></canvas>
+    <div class="draw-hint" id="draw-hint">✏️ Draw with your finger!</div>
+  </div>
+  <div id="draw-bar">
+    <button id="draw-toggle" onclick="toggleDraw()">✏️ Draw</button>
+    <div class="draw-colors">
+      <div class="dcolor on" style="background:#e04040" onclick="setDrawColor(this,'#e04040')"></div>
+      <div class="dcolor" style="background:#f5c540" onclick="setDrawColor(this,'#f5c540')"></div>
+      <div class="dcolor" style="background:#18c8a0" onclick="setDrawColor(this,'#18c8a0')"></div>
+      <div class="dcolor" style="background:#4488ff" onclick="setDrawColor(this,'#4488ff')"></div>
+      <div class="dcolor" style="background:#e060c0" onclick="setDrawColor(this,'#e060c0')"></div>
+      <div class="dcolor" style="background:#1a2e22" onclick="setDrawColor(this,'#1a2e22')"></div>
+      <div class="dcolor" style="background:#ffffff;border:2px solid #ccc" onclick="setDrawColor(this,'#ffffff')"></div>
+    </div>
+    <div class="draw-sizes">
+      <div class="dsize on" style="width:14px;height:14px" onclick="setDrawSize(this,4)"></div>
+      <div class="dsize" style="width:22px;height:22px" onclick="setDrawSize(this,10)"></div>
+      <div class="dsize" style="width:30px;height:30px" onclick="setDrawSize(this,20)"></div>
+    </div>
+    <button id="draw-undo" onclick="undoDraw()">↩ Undo</button>
   </div>
   <div id="sbar">
     <div class="srow">
@@ -256,7 +317,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:6px
 <script>
 var vid=document.getElementById('vid'),flash=document.getElementById('flash'),cdown=document.getElementById('cdown'),cnum=document.getElementById('cnum'),shutbtn=document.getElementById('shutbtn'),viewbtn=document.getElementById('viewbtn'),statusCard=document.getElementById('status-card'),gobtn=document.getElementById('gobtn'),toast=document.getElementById('toast');
 var myStream=null,facing='user',curFilter='sunny',photos=[],layers=[[],[],[],[]],busy=false;
-var CSS_FILTERS={'sunny':'none','moon':'grayscale(1) contrast(1.1)','golden':'sepia(.45) saturate(1.35) brightness(1.06)','twilight':'hue-rotate(195deg) saturate(.9) brightness(1.04)','vintage':'sepia(.65) contrast(.88) brightness(.94) saturate(.75)','festival':'contrast(1.45) saturate(1.4) brightness(.88)'};
+var CSS_FILTERS={'sunny':'none','moon':'grayscale(1) contrast(1.1)','golden':'sepia(.45) saturate(1.35) brightness(1.06)','twilight':'hue-rotate(195deg) saturate(.9) brightness(1.04)','vintage':'sepia(.65) contrast(.88) brightness(.94) saturate(.75)','festival':'contrast(1.45) saturate(1.4) brightness(.88)','glow':'brightness(1.15) saturate(1.4) contrast(1.1)','invert':'invert(1) hue-rotate(180deg)','mirror':'none','pixel':'none'};
+var SPECIAL_FILTERS=['mirror','pixel']; // these need canvas pixel work
 
 // ─── Inactivity timer (2 min) — stops camera to save battery ──
 var IDLE_MS=2*60*1000;
@@ -278,7 +340,8 @@ function goToSleep(){
   document.getElementById('preview').classList.remove('open');
   // Reset state
   photos.forEach(function(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u);}catch(e){}});
-  photos=[];layers=[[],[],[],[]];photoImgs=[null,null,null,null];busy=false;
+  photos=[];layers=[[],[],[],[]];photoImgs=[null,null,null,null];drawStrokes=[];drawMode=false;busy=false;
+  var dt=document.getElementById('draw-toggle');if(dt)dt.classList.remove('active');
   shutbtn.classList.remove('busy');viewbtn.style.display='none';updateDots();
   // Show splash
   document.getElementById('splash').style.display='';
@@ -301,9 +364,45 @@ function setF(b){document.querySelectorAll('.fb').forEach(function(x){x.classLis
 function flipCam(){facing=(facing==='user')?'environment':'user';vid.style.transform=(facing==='user')?'scaleX(-1)':'scaleX(1)';if(myStream)myStream.getTracks().forEach(function(t){t.stop();});navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false}).then(function(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play();};}).catch(function(e){console.error('flip',e);});}
 function updateDots(){for(var i=0;i<4;i++){var d=document.getElementById('d'+i);d.className='dot';if(i<photos.length)d.classList.add('lit');else if(i===photos.length&&busy)d.classList.add('live');}}
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
-function doCountdown(){var lbl=document.querySelector('.cdown-label'),msgs=['Say cheese! 🧀','Get ready! 📸','MashaAllah!','Smile big! 😄'];return new Promise(function(res){cdown.classList.add('show');if(lbl)lbl.textContent=msgs[photos.length]||msgs[0];var n=3;function tick(){cnum.textContent=n;cnum.classList.remove('pop');void cnum.offsetWidth;cnum.classList.add('pop');if(n<=1){setTimeout(function(){cdown.classList.remove('show');res();},880);return;}n--;setTimeout(tick,960);}tick();});}
+function doCountdown(){var lbl=document.querySelector('.cdown-label'),msgs=['Say cheese! 🧀','Get ready! 📸','Strike a pose! 💃','Smile big! 😄'];return new Promise(function(res){cdown.classList.add('show');if(lbl)lbl.textContent=msgs[photos.length]||msgs[0];var n=3;function tick(){cnum.textContent=n;cnum.classList.remove('pop');void cnum.offsetWidth;cnum.classList.add('pop');if(n<=1){setTimeout(function(){cdown.classList.remove('show');res();},880);return;}n--;setTimeout(tick,960);}tick();});}
 
-function grabFrame(){return new Promise(function(res){flash.classList.remove('go');void flash.offsetWidth;flash.classList.add('go');var vw=vid.videoWidth,vh=vid.videoHeight;if(!vw||!vh){res(null);return;}var sc=1,MAX=1280;if(Math.max(vw,vh)>MAX)sc=MAX/Math.max(vw,vh);var w=Math.round(vw*sc),h=Math.round(vh*sc);var c=document.createElement('canvas');c.width=w;c.height=h;var ctx=c.getContext('2d');var f=CSS_FILTERS[curFilter]||'none';if(typeof ctx.filter!=='undefined')ctx.filter=f;if(facing==='user'){ctx.translate(w,0);ctx.scale(-1,1);}ctx.drawImage(vid,0,0,w,h);ctx.setTransform(1,0,0,1,0,0);if(typeof ctx.filter!=='undefined')ctx.filter='none';var vg=ctx.createRadialGradient(w/2,h/2,h*.26,w/2,h/2,h*.72);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.35)');ctx.fillStyle=vg;ctx.fillRect(0,0,w,h);try{c.toBlob(function(blob){if(!blob){try{res(c.toDataURL('image/jpeg',.88));}catch(e2){res(null);}return;}res(URL.createObjectURL(blob));},'image/jpeg',.88);}catch(e){try{res(c.toDataURL('image/jpeg',.88));}catch(e2){res(null);}}});}
+function grabFrame(){return new Promise(function(res){flash.classList.remove('go');void flash.offsetWidth;flash.classList.add('go');var vw=vid.videoWidth,vh=vid.videoHeight;if(!vw||!vh){res(null);return;}var sc=1,MAX=1280;if(Math.max(vw,vh)>MAX)sc=MAX/Math.max(vw,vh);var w=Math.round(vw*sc),h=Math.round(vh*sc);var c=document.createElement('canvas');c.width=w;c.height=h;var ctx=c.getContext('2d');
+  // Apply CSS filter
+  var f=CSS_FILTERS[curFilter]||'none';
+  if(typeof ctx.filter!=='undefined'&&f!=='none')ctx.filter=f;
+  if(facing==='user'){ctx.translate(w,0);ctx.scale(-1,1);}
+  ctx.drawImage(vid,0,0,w,h);
+  ctx.setTransform(1,0,0,1,0,0);
+  if(typeof ctx.filter!=='undefined')ctx.filter='none';
+
+  // ── Special filter: Mirror (left half mirrored to right)
+  if(curFilter==='mirror'){
+    var half=Math.floor(w/2);
+    var left=ctx.getImageData(0,0,half,h);
+    // Draw left half normally, then flip it for right
+    ctx.putImageData(left,0,0);
+    ctx.save();ctx.translate(w,0);ctx.scale(-1,1);
+    ctx.drawImage(c,0,0,half,h,0,0,half,h);
+    ctx.restore();
+  }
+
+  // ── Special filter: Pixelate
+  if(curFilter==='pixel'){
+    var pxSize=12;
+    var sw=Math.floor(w/pxSize),sh=Math.floor(h/pxSize);
+    var tc=document.createElement('canvas');tc.width=sw;tc.height=sh;
+    var tctx=tc.getContext('2d');
+    tctx.drawImage(c,0,0,sw,sh);
+    ctx.imageSmoothingEnabled=false;
+    ctx.clearRect(0,0,w,h);
+    ctx.drawImage(tc,0,0,sw,sh,0,0,w,h);
+    ctx.imageSmoothingEnabled=true;
+  }
+
+  // Vignette
+  var vg=ctx.createRadialGradient(w/2,h/2,h*.26,w/2,h/2,h*.72);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.35)');ctx.fillStyle=vg;ctx.fillRect(0,0,w,h);
+  try{c.toBlob(function(blob){if(!blob){try{res(c.toDataURL('image/jpeg',.88));}catch(e2){res(null);}return;}res(URL.createObjectURL(blob));},'image/jpeg',.88);}catch(e){try{res(c.toDataURL('image/jpeg',.88));}catch(e2){res(null);}}
+});}
 
 async function shoot(){if(busy||!myStream)return;if(photos.length>=4){openDecorate();return;}busy=true;shutbtn.classList.add('busy');while(photos.length<4){updateDots();await doCountdown();var u=await grabFrame();if(u)photos.push(u);updateDots();await sleep(380);}busy=false;shutbtn.classList.remove('busy');updateDots();viewbtn.style.display='block';openDecorate();}
 
@@ -370,7 +469,7 @@ function draw46(ctx,W,H){
   // Date
   ctx.fillStyle='#c8880c';
   ctx.font='700 '+Math.round(W*.028)+'px "Baloo 2",sans-serif';
-  ctx.fillText('March 20, 2026',W/2,H*.113);
+  ctx.fillText('March 30, 2026',W/2,H*.113);
   // Divider
   ctx.fillStyle='#c8880c';rr(ctx,W*.07,H*.126,W*.86,Math.max(2,H*.002),1);ctx.fill();
   // Second deco row
@@ -393,11 +492,14 @@ function draw46(ctx,W,H){
     layers[i].forEach(function(s){ctx.save();ctx.translate(ox+s.xf*cW,oy+s.yf*cH);ctx.rotate(s.r*Math.PI/180);ctx.font=(s.sf*Math.min(cW,cH))+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.e,0,0);ctx.restore();});
   });
 
+  // ── Drawing strokes
+  renderAllStrokes(ctx,W,H);
+
   // Footer
   ctx.textAlign='center';ctx.fillStyle='#c8880c';ctx.font=Math.round(W*.02)+'px serif';
   ctx.fillText('🌙  ⭐  ✨  Eid Mubarak!  ✨  ⭐  🌙',W/2,H*.96);
   ctx.fillStyle='#8aaa90';ctx.font='600 '+Math.round(W*.015)+'px "Nunito",sans-serif';
-  ctx.fillText('Thanks For Coming!',W/2,H*.98);
+  ctx.fillText('Photo Booth Memories',W/2,H*.98);
 }
 
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
@@ -407,6 +509,124 @@ function addSticker(emoji){for(var i=0;i<4;i++){if(!photos[i])continue;layers[i]
 var ALL_STICKERS=['🌙','⭐','🌟','✨','🕌','🪔','🌺','💫','🎉','🎊','🎈','👑','🦋','🌈','🥳','🤩','😄','🎁','🌸'];
 function surprise(){var c=3+Math.floor(Math.random()*4);for(var s=0;s<c;s++){var em=ALL_STICKERS[Math.floor(Math.random()*ALL_STICKERS.length)];for(var i=0;i<4;i++){if(!photos[i])continue;layers[i].push({e:em,xf:.08+Math.random()*.84,yf:.08+Math.random()*.84,sf:.07+Math.random()*.1,r:(Math.random()-.5)*60});}}renderPreview();}
 function clearStickers(){layers=[[],[],[],[]];renderPreview();}
+function clearAll(){layers=[[],[],[],[]];drawStrokes=[];renderPreview();}
+
+// ─── Finger Drawing System ──────────────────────────────
+var drawStrokes=[]; // [{points:[{x,y}...], color, width}]
+var drawMode=false;
+var drawColor='#e04040';
+var drawWidth=4;
+var isDrawing=false;
+
+function toggleDraw(){
+  drawMode=!drawMode;
+  var btn=document.getElementById('draw-toggle');
+  btn.classList.toggle('active',drawMode);
+  var hint=document.getElementById('draw-hint');
+  if(drawMode){hint.classList.add('show');setTimeout(function(){hint.classList.remove('show');},1500);}
+  else{hint.classList.remove('show');}
+}
+function setDrawColor(el,color){
+  drawColor=color;
+  document.querySelectorAll('.dcolor').forEach(function(d){d.classList.remove('on');});
+  el.classList.add('on');
+}
+function setDrawSize(el,size){
+  drawWidth=size;
+  document.querySelectorAll('.dsize').forEach(function(d){d.classList.remove('on');});
+  el.classList.add('on');
+}
+function undoDraw(){
+  if(drawStrokes.length){drawStrokes.pop();renderPreview();}
+}
+
+// Touch handlers for drawing on the preview canvas
+(function(){
+  var cv=document.getElementById('dec-preview');
+  function getPos(e){
+    var t=e.touches?e.touches[0]:e;
+    var r=cv.getBoundingClientRect();
+    // Normalize to 0-1 range so it scales to any render size
+    return{x:(t.clientX-r.left)/r.width, y:(t.clientY-r.top)/r.height};
+  }
+  cv.addEventListener('touchstart',function(e){
+    if(!drawMode)return;
+    e.preventDefault();
+    isDrawing=true;
+    var p=getPos(e);
+    drawStrokes.push({points:[p],color:drawColor,width:drawWidth});
+    renderDrawLive();
+  },{passive:false});
+  cv.addEventListener('touchmove',function(e){
+    if(!drawMode||!isDrawing)return;
+    e.preventDefault();
+    var p=getPos(e);
+    var cur=drawStrokes[drawStrokes.length-1];
+    if(cur)cur.points.push(p);
+    renderDrawLive();
+  },{passive:false});
+  cv.addEventListener('touchend',function(){isDrawing=false;});
+  cv.addEventListener('touchcancel',function(){isDrawing=false;});
+  // Mouse fallback (for testing on desktop)
+  cv.addEventListener('mousedown',function(e){
+    if(!drawMode)return;
+    isDrawing=true;
+    var r=cv.getBoundingClientRect();
+    var p={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};
+    drawStrokes.push({points:[p],color:drawColor,width:drawWidth});
+    renderDrawLive();
+  });
+  cv.addEventListener('mousemove',function(e){
+    if(!drawMode||!isDrawing)return;
+    var r=cv.getBoundingClientRect();
+    var p={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};
+    var cur=drawStrokes[drawStrokes.length-1];
+    if(cur)cur.points.push(p);
+    renderDrawLive();
+  });
+  cv.addEventListener('mouseup',function(){isDrawing=false;});
+})();
+
+// Fast live draw: just draw the current stroke on top (no full re-render)
+function renderDrawLive(){
+  var cv=decCanvas;
+  var ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height;
+  // Only redraw the latest stroke for performance
+  var s=drawStrokes[drawStrokes.length-1];
+  if(!s||s.points.length<2)return;
+  ctx.save();
+  ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.strokeStyle=s.color;
+  ctx.lineWidth=s.width*(W/300); // scale width to canvas
+  ctx.beginPath();
+  ctx.moveTo(s.points[0].x*W,s.points[0].y*H);
+  for(var i=1;i<s.points.length;i++){
+    ctx.lineTo(s.points[i].x*W,s.points[i].y*H);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Full render with all strokes (used after undo, sticker add, etc.)
+function renderAllStrokes(ctx,W,H){
+  if(!drawStrokes.length)return;
+  ctx.save();
+  ctx.lineCap='round';ctx.lineJoin='round';
+  for(var s=0;s<drawStrokes.length;s++){
+    var st=drawStrokes[s];
+    if(st.points.length<2)continue;
+    ctx.strokeStyle=st.color;
+    ctx.lineWidth=st.width*(W/300);
+    ctx.beginPath();
+    ctx.moveTo(st.points[0].x*W,st.points[0].y*H);
+    for(var i=1;i<st.points.length;i++){
+      ctx.lineTo(st.points[i].x*W,st.points[i].y*H);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
+}
 
 // ── Save: render at full 1200×1800 and download
 function saveStrip(){
@@ -444,7 +664,7 @@ function deletePreview(){if(prevCur.id!=null)deleteFromGallery(prevCur.id,functi
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
 
-function resetAll(){photos.forEach(function(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u);}catch(e){}});photos=[];layers=[[],[],[],[]];photoImgs=[null,null,null,null];busy=false;shutbtn.classList.remove('busy');viewbtn.style.display='none';updateDots();document.getElementById('dec').classList.remove('open');}
+function resetAll(){photos.forEach(function(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u);}catch(e){}});photos=[];layers=[[],[],[],[]];photoImgs=[null,null,null,null];drawStrokes=[];drawMode=false;var dt=document.getElementById('draw-toggle');if(dt)dt.classList.remove('active');busy=false;shutbtn.classList.remove('busy');viewbtn.style.display='none';updateDots();document.getElementById('dec').classList.remove('open');}
 </script>
 </body>
 </html>
