@@ -2,7 +2,7 @@
 var CACHE_NAME = 'eid-booth-v1';
 var URLS_TO_CACHE = [
   './',
-  './photobooth.html',
+  './index.html',
   './manifest.json',
   'https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap'
 ];
