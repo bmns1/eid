@@ -43,7 +43,7 @@ self.addEventListener('fetch', function(event) {
         return response;
       }).catch(function() {
         // Offline fallback — return cached main page
-        return caches.match('./photobooth.html');
+        return caches.match('./index.html');
       });
     })
   );
