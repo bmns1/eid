@@ -12,431 +12,161 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* =====================================================
-   EID MUBARAK PHOTO BOOTH v6 — Android-optimized
-   ===================================================== */
-:root {
-  --bg:    #04120d;
-  --surf:  #0a2219;
-  --surf2: #071a12;
-  --gold:  #f5c540;
-  --gold2: #c8880c;
-  --gold3: #a06e08;
-  --teal:  #18c8a0;
-  --teal2: #0d8c70;
-  --lamp:  #e8783a;
-  --cream: #fffaee;
-  --text:  #f0f8ee;
-  --dim:   #4a8068;
-  --rd:    #e04848;
-  --green: #3dd68c;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
-html,body{width:100%;height:100%;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);overflow:hidden;overscroll-behavior:none;}
-button{font-family:inherit;-webkit-appearance:none;}
+:root{--bg:#04120d;--surf:#0a2219;--surf2:#071a12;--gold:#f5c540;--gold2:#c8880c;--teal:#18c8a0;--teal2:#0d8c70;--cream:#fffaee;--text:#f0f8ee;--dim:#4a8068;--rd:#e04848;--green:#3dd68c}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html,body{width:100%;height:100%;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);overflow:hidden;overscroll-behavior:none}
+button{font-family:inherit;-webkit-appearance:none}
 
-/* ── ANIMATED STAR FIELD ── */
-#starfield{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.sf-star{position:absolute;font-size:14px;animation:sftwink linear infinite;opacity:.15;}
+#starfield{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.sf-star{position:absolute;font-size:14px;animation:sftwink linear infinite;opacity:.15}
 @keyframes sftwink{0%,100%{opacity:.1;transform:scale(.85)}50%{opacity:.45;transform:scale(1.15)}}
 
-/* ── APP SHELL ── */
-#app{display:flex;flex-direction:column;height:100dvh;position:relative;z-index:1;}
+#app{display:flex;flex-direction:column;height:100dvh;position:relative;z-index:1}
 
-/* ── HEADER ── */
-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 14px 7px;background:var(--surf);
-  border-bottom:2.5px solid var(--gold2);flex-shrink:0;
-}
-.logo{display:flex;align-items:center;gap:7px;}
-.logo-moon{font-size:26px;animation:mfloat 5s ease-in-out infinite;}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 9px;background:var(--surf);border-bottom:3px solid var(--gold2);flex-shrink:0}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-moon{font-size:30px;animation:mfloat 5s ease-in-out infinite}
 @keyframes mfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.logo-text{line-height:1;}
-.logo-main{font-family:'Baloo 2',sans-serif;font-size:20px;font-weight:800;color:var(--gold);display:block;}
-.logo-sub{font-size:8px;color:var(--teal);letter-spacing:2.5px;text-transform:uppercase;font-weight:800;display:block;margin-top:-1px;}
-
-.shots-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
-.shots-label{font-size:7px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;font-weight:800;}
-.dots{display:flex;gap:7px;}
-.dot{width:11px;height:11px;border-radius:50%;background:#163028;border:1.5px solid #1e4030;transition:all .3s;}
-.dot.lit{background:var(--gold);border-color:var(--gold);transform:scale(1.2);box-shadow:0 0 10px rgba(245,197,64,.5);}
-.dot.live{background:var(--gold);border-color:var(--gold);box-shadow:0 0 14px var(--gold);animation:dblink .6s infinite;}
+.logo-main{font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:800;color:var(--gold);display:block}
+.logo-sub{font-size:10px;color:var(--teal);letter-spacing:2.5px;text-transform:uppercase;font-weight:800;display:block;margin-top:-1px}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.dots{display:flex;gap:8px}
+.dot{width:14px;height:14px;border-radius:50%;background:#163028;border:2px solid #1e4030;transition:all .3s}
+.dot.lit{background:var(--gold);border-color:var(--gold);transform:scale(1.2);box-shadow:0 0 10px rgba(245,197,64,.5)}
+.dot.live{background:var(--gold);border-color:var(--gold);box-shadow:0 0 14px var(--gold);animation:dblink .6s infinite}
 @keyframes dblink{0%,100%{opacity:1}50%{opacity:.15}}
 
-/* ── VIEWFINDER ── */
-#vf{flex:1;position:relative;overflow:hidden;background:#000;}
-#vid{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);}
-#vid.f-sunny{filter:none}
-#vid.f-moon{filter:grayscale(1) contrast(1.1)}
-#vid.f-golden{filter:sepia(.45) saturate(1.35) brightness(1.06)}
-#vid.f-twilight{filter:hue-rotate(195deg) saturate(.9) brightness(1.04)}
-#vid.f-vintage{filter:sepia(.65) contrast(.88) brightness(.94) saturate(.75)}
-#vid.f-festival{filter:contrast(1.45) saturate(1.4) brightness(.88)}
+.gal-btn{background:var(--surf2);border:2px solid #1e3c2a;color:var(--dim);cursor:pointer;padding:10px 14px;border-radius:14px;font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px;transition:all .18s;white-space:nowrap}
+.gal-count{background:var(--gold2);color:var(--bg);font-size:13px;font-weight:800;padding:2px 8px;border-radius:10px;min-width:24px;text-align:center}
+.gal-btn:active{transform:scale(.92)}
 
-/* Corner ornaments */
-.orn{position:absolute;z-index:3;pointer-events:none;font-size:20px;opacity:.55;animation:ofloat 4s ease-in-out infinite;}
-.orn.tl{top:8px;left:8px;animation-delay:0s}
-.orn.tr{top:8px;right:8px;animation-delay:1s}
-.orn.bl{bottom:8px;left:8px;animation-delay:2s}
-.orn.br{bottom:8px;right:8px;animation-delay:.5s}
+#vf{flex:1;position:relative;overflow:hidden;background:#000}
+#vid{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}
+#vid.f-sunny{filter:none}#vid.f-moon{filter:grayscale(1) contrast(1.1)}#vid.f-golden{filter:sepia(.45) saturate(1.35) brightness(1.06)}#vid.f-twilight{filter:hue-rotate(195deg) saturate(.9) brightness(1.04)}#vid.f-vintage{filter:sepia(.65) contrast(.88) brightness(.94) saturate(.75)}#vid.f-festival{filter:contrast(1.45) saturate(1.4) brightness(.88)}
+.orn{position:absolute;z-index:3;pointer-events:none;font-size:22px;opacity:.55;animation:ofloat 4s ease-in-out infinite}
+.orn.tl{top:8px;left:8px}.orn.tr{top:8px;right:8px;animation-delay:1s}.orn.bl{bottom:8px;left:8px;animation-delay:2s}.orn.br{bottom:8px;right:8px;animation-delay:.5s}
 @keyframes ofloat{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+#vig{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center,transparent 44%,rgba(4,18,13,.7) 100%)}
 
-/* Vignette */
-#vig{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center,transparent 44%,rgba(4,18,13,.7) 100%);}
-
-/* Countdown overlay */
-#cdown{
-  position:absolute;inset:0;z-index:10;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .15s;
-  background:rgba(4,18,13,.4);
-}
+#cdown{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;background:rgba(4,18,13,.4)}
 #cdown.show{opacity:1}
-#cnum{
-  font-family:'Baloo 2',sans-serif;font-size:180px;font-weight:800;line-height:1;
-  color:var(--gold);
-  text-shadow:0 0 80px rgba(245,197,64,.6),0 4px 30px rgba(0,0,0,.9);
-}
+#cnum{font-family:'Baloo 2',sans-serif;font-size:200px;font-weight:800;line-height:1;color:var(--gold);text-shadow:0 0 80px rgba(245,197,64,.6),0 4px 30px rgba(0,0,0,.9)}
 #cnum.pop{animation:cpop .88s ease-out}
 @keyframes cpop{0%{transform:scale(2) rotate(-8deg);opacity:0}38%{transform:scale(1) rotate(2deg);opacity:1}100%{transform:scale(.7) rotate(0);opacity:.4}}
-.cdown-label{
-  font-family:'Baloo 2',sans-serif;font-size:20px;font-weight:700;
-  color:var(--teal);margin-top:2px;letter-spacing:1px;
-  text-shadow:0 2px 12px rgba(0,0,0,.6);
-}
+.cdown-label{font-family:'Baloo 2',sans-serif;font-size:26px;font-weight:700;color:var(--teal);margin-top:2px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 
-/* Flash */
-#flash{position:absolute;inset:0;z-index:20;background:#fffadc;opacity:0;pointer-events:none;}
+#flash{position:absolute;inset:0;z-index:20;background:#fffadc;opacity:0;pointer-events:none}
 #flash.go{animation:fwh .5s ease-out forwards}
 @keyframes fwh{0%{opacity:.9}100%{opacity:0}}
 
-/* ── FILTER BAR ── */
-#fbar{
-  display:flex;overflow-x:auto;flex-shrink:0;
-  background:var(--surf2);border-top:1px solid #0f3022;
-  scrollbar-width:none;padding:0 4px;
-}
+#fbar{display:flex;overflow-x:auto;flex-shrink:0;background:var(--surf2);border-top:1px solid #0f3022;scrollbar-width:none;padding:0 4px}
 #fbar::-webkit-scrollbar{display:none}
-.fb{
-  flex:0 0 auto;padding:8px 14px 7px;
-  font-family:'Nunito',sans-serif;font-weight:800;font-size:10px;
-  letter-spacing:.5px;text-transform:uppercase;color:var(--dim);
-  background:none;border:none;cursor:pointer;
-  position:relative;transition:color .2s;
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-}
-.fb .fi{font-size:16px}
-.fb::after{
-  content:'';position:absolute;bottom:0;left:50%;
-  transform:translateX(-50%);height:2.5px;width:0;
-  background:var(--gold);transition:width .2s;border-radius:2px;
-}
-.fb.on{color:var(--gold)}
-.fb.on::after{width:80%}
+.fb{flex:0 0 auto;padding:10px 16px 9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--dim);background:none;border:none;cursor:pointer;position:relative;transition:color .2s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.fb .fi{font-size:20px}
+.fb::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:3px;width:0;background:var(--gold);transition:width .2s;border-radius:2px}
+.fb.on{color:var(--gold)}.fb.on::after{width:80%}
 
-/* ── CONTROLS ── */
-#ctrl{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 14px 12px;background:var(--surf);
-  border-top:2.5px solid var(--gold2);flex-shrink:0;gap:10px;
-}
-.ctrl-side{display:flex;gap:6px;align-items:center;}
-.ctrl-side-r{display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
-
-.cbtn{
-  background:var(--surf2);border:1.5px solid #1e3c2a;
-  color:var(--dim);cursor:pointer;
-  padding:9px 11px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .18s;font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;
-}
-.cbtn svg{width:17px;height:17px}
-.cbtn.on{border-color:var(--gold);color:var(--gold)}
-
-#flipbtn{
-  background:var(--surf2);border:1.5px solid #1e3c2a;color:var(--dim);
-  cursor:pointer;padding:9px 11px;border-radius:12px;
-  font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;
-  transition:all .18s;
-}
-
-#shutbtn{
-  width:74px;height:74px;border-radius:50%;
-  background:radial-gradient(circle at 38% 35%,#ffdf70,var(--gold2));
-  border:3.5px solid rgba(255,255,255,.12);
-  cursor:pointer;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 0 4px var(--surf),0 0 28px rgba(245,197,64,.35);
-  transition:transform .12s,box-shadow .2s;
-}
+#ctrl{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px;background:var(--surf);border-top:3px solid var(--gold2);flex-shrink:0;gap:10px}
+.ctrl-side{display:flex;gap:8px;align-items:center}
+.ctrl-side-r{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.cbtn{background:var(--surf2);border:2px solid #1e3c2a;color:var(--dim);cursor:pointer;padding:12px 14px;border-radius:14px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.cbtn svg{width:22px;height:22px}.cbtn.on{border-color:var(--gold);color:var(--gold)}
+#flipbtn{background:var(--surf2);border:2px solid #1e3c2a;color:var(--dim);cursor:pointer;padding:12px 14px;border-radius:14px;font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .18s}
+#shutbtn{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 38% 35%,#ffdf70,var(--gold2));border:4px solid rgba(255,255,255,.12);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 5px var(--surf),0 0 32px rgba(245,197,64,.35);transition:transform .12s,box-shadow .2s}
 #shutbtn:active{transform:scale(.88)}
-#shutbtn.busy{background:var(--surf2);box-shadow:0 0 0 4px var(--surf);cursor:not-allowed;opacity:.4}
-#shutbtn svg{width:28px;height:28px;fill:var(--surf)}
+#shutbtn.busy{background:var(--surf2);box-shadow:0 0 0 5px var(--surf);cursor:not-allowed;opacity:.4}
+#shutbtn svg{width:34px;height:34px;fill:var(--surf)}
+.abtn{background:none;border:2px solid #1e3c2a;color:var(--dim);cursor:pointer;padding:12px 18px;border-radius:14px;font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;white-space:nowrap;transition:all .18s}
+.abtn.hi{border-color:var(--teal2);color:var(--teal);background:rgba(13,140,112,.08)}
 
-.abtn{
-  background:none;border:1.5px solid #1e3c2a;color:var(--dim);cursor:pointer;
-  padding:8px 13px;border-radius:12px;
-  font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;
-  letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;transition:all .18s;
-}
-.abtn.hi{border-color:var(--teal2);color:var(--teal);background:rgba(13,140,112,.08);}
-
-/* ── DECORATE MODAL ── */
-#dec{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column;overflow:hidden;}
+#dec{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column;overflow:hidden}
 #dec.open{display:flex}
-#dec-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 14px 7px;background:var(--surf);
-  border-bottom:2.5px solid var(--gold2);flex-shrink:0;gap:8px;
-}
-.dec-ht{font-family:'Baloo 2',sans-serif;font-size:19px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:5px;flex:1;}
-.dec-hs{font-size:8px;color:var(--dim);font-weight:800;letter-spacing:1px;text-transform:uppercase;}
-.dec-layout{display:flex;gap:5px;align-items:center;}
-.dlbtn{
-  background:var(--surf2);border:1.5px solid #1e3c2a;color:var(--dim);
-  cursor:pointer;padding:7px 9px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;transition:all .18s;
-}
-.dlbtn svg{width:15px;height:15px}
-.dlbtn.on{border-color:var(--gold);color:var(--gold)}
-#dec-clear{
-  background:none;border:1.5px solid #3a1818;color:#c06050;
-  padding:7px 13px;border-radius:10px;cursor:pointer;
-  font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
-}
+#dec-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 9px;background:var(--surf);border-bottom:3px solid var(--gold2);flex-shrink:0;gap:8px}
+.dec-ht{font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:6px;flex:1}
+.dec-hs{font-size:11px;color:var(--dim);font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.dec-layout{display:flex;gap:6px;align-items:center}
+.dlbtn{background:var(--surf2);border:2px solid #1e3c2a;color:var(--dim);cursor:pointer;padding:10px 12px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.dlbtn svg{width:20px;height:20px}.dlbtn.on{border-color:var(--gold);color:var(--gold)}
+#dec-clear{background:none;border:2px solid #3a1818;color:#c06050;padding:10px 16px;border-radius:12px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase}
 
-/* 2×2 photo grid */
-#dec-photos{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;overflow:hidden;min-height:0;}
-.dc{position:relative;border-radius:10px;overflow:hidden;background:#0a0a0a;display:flex;align-items:center;justify-content:center;}
-.dc canvas{width:100%;height:100%;display:block;border-radius:10px;}
-.dc::after{content:'';position:absolute;inset:0;border-radius:10px;background:rgba(245,197,64,0);transition:background .3s;pointer-events:none;}
+#dec-photos{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;overflow:hidden;min-height:0}
+.dc{position:relative;border-radius:10px;overflow:hidden;background:#0a0a0a;display:flex;align-items:center;justify-content:center}
+.dc canvas{width:100%;height:100%;display:block;border-radius:10px}
+.dc::after{content:'';position:absolute;inset:0;border-radius:10px;background:rgba(245,197,64,0);transition:background .3s;pointer-events:none}
 .dc.tapped::after{background:rgba(245,197,64,.18)}
 
-/* Sticker bar */
-#sbar{flex-shrink:0;padding:6px 8px 5px;background:var(--surf);border-top:2px solid var(--gold2);}
-.srow{display:flex;gap:5px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none;}
-.srow::-webkit-scrollbar{display:none}
-.srow+.srow{margin-top:4px}
-.sk{
-  flex:0 0 auto;width:48px;height:48px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:27px;border-radius:14px;
-  background:var(--surf2);border:1.5px solid #1e3c2a;
-  cursor:pointer;user-select:none;-webkit-user-select:none;
-  transition:transform .1s,background .15s;
-}
+#sbar{flex-shrink:0;padding:8px 8px 6px;background:var(--surf);border-top:2px solid var(--gold2)}
+.srow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.srow::-webkit-scrollbar{display:none}.srow+.srow{margin-top:5px}
+.sk{flex:0 0 auto;width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:32px;border-radius:16px;background:var(--surf2);border:2px solid #1e3c2a;cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .1s,background .15s}
 .sk:active{transform:scale(.72);background:#224838}
-.sk.magic{
-  width:auto;padding:0 16px;font-size:13px;gap:5px;
-  font-family:'Baloo 2',sans-serif;font-weight:700;color:var(--gold);
-  border-color:var(--gold2);letter-spacing:.5px;
-  background:linear-gradient(135deg,#1a3020,#0c2018);
-}
+.sk.magic{width:auto;padding:0 20px;font-size:17px;gap:6px;font-family:'Baloo 2',sans-serif;font-weight:700;color:var(--gold);border-color:var(--gold2);background:linear-gradient(135deg,#1a3020,#0c2018)}
 .sk.magic:active{transform:scale(.93)}
 
-/* Decorate actions */
-#dec-actions{display:flex;gap:10px;padding:8px 12px 12px;background:var(--surf2);border-top:1px solid #0f3022;flex-shrink:0;}
-.da{
-  flex:1;padding:14px 8px;border-radius:16px;cursor:pointer;
-  font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:700;letter-spacing:.5px;
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  transition:transform .12s;
-}
+#dec-actions{display:flex;gap:12px;padding:10px 14px 14px;background:var(--surf2);border-top:1px solid #0f3022;flex-shrink:0}
+.da{flex:1;padding:20px 8px;border-radius:20px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s;border:none}
 .da:active{transform:scale(.94)}
-.da.retake{background:var(--surf2);border:1.5px solid #2a4838;color:var(--dim)}
-.da.save{
-  background:radial-gradient(circle at 38% 38%,#ffdf70,var(--gold2));
-  border:none;color:var(--surf);
-  box-shadow:0 4px 24px rgba(245,197,64,.35);
-}
+.da.retake{background:var(--surf2);border:2px solid #2a4838;color:var(--dim)}
+.da.save{background:radial-gradient(circle at 38% 38%,#ffdf70,var(--gold2));color:var(--surf);box-shadow:0 4px 24px rgba(245,197,64,.35)}
 
-/* ── TOAST ── */
-#toast{
-  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--teal2);color:#fff;padding:12px 28px;border-radius:50px;
-  font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:700;letter-spacing:.5px;
-  z-index:200;opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap;
-  box-shadow:0 4px 20px rgba(13,140,112,.3);
-}
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--teal2);color:#fff;padding:14px 32px;border-radius:50px;font-family:'Baloo 2',sans-serif;font-size:20px;font-weight:700;z-index:200;opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap;box-shadow:0 4px 20px rgba(13,140,112,.3)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── SPLASH SCREEN ── */
-#splash{
-  position:fixed;inset:0;z-index:100;
-  background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;padding:32px;text-align:center;overflow:hidden;
-}
-.sp-deco{position:absolute;pointer-events:none;font-size:20px;opacity:.15;animation:sftwink linear infinite;}
-.sp-moon{font-size:80px;display:block;margin-bottom:2px;animation:mfloat 5s ease-in-out infinite;}
-.sp-h1{
-  font-family:'Baloo 2',sans-serif;font-size:46px;font-weight:800;
-  color:var(--gold);line-height:1;
-  text-shadow:0 0 60px rgba(245,197,64,.4);
-}
-.sp-h2{font-family:'Baloo 2',sans-serif;font-size:26px;font-weight:700;color:var(--teal);line-height:1;}
-.sp-sub{font-size:13px;line-height:1.8;color:var(--dim);max-width:300px;margin-top:2px;}
-
-/* Start button */
-#gobtn{
-  margin-top:14px;padding:18px 60px;
-  background:radial-gradient(circle at 38% 38%,#ffdf70,var(--gold2));
-  color:var(--surf);border:none;cursor:pointer;border-radius:60px;
-  font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:800;letter-spacing:2px;
-  box-shadow:0 6px 36px rgba(245,197,64,.35);
-  transition:transform .12s,box-shadow .12s;
-}
-#gobtn:active{transform:scale(.94)}
-#gobtn:disabled{opacity:.35;cursor:not-allowed;transform:none}
-
-/* Permission / error cards */
-#status-card{
-  margin-top:12px;max-width:340px;width:100%;
-  border-radius:16px;overflow:hidden;
-  display:none;text-align:left;
-}
+#splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:32px;text-align:center;overflow:hidden}
+.sp-deco{position:absolute;pointer-events:none;font-size:20px;opacity:.15;animation:sftwink linear infinite}
+.sp-moon{font-size:88px;display:block;margin-bottom:2px;animation:mfloat 5s ease-in-out infinite}
+.sp-h1{font-family:'Baloo 2',sans-serif;font-size:50px;font-weight:800;color:var(--gold);line-height:1;text-shadow:0 0 60px rgba(245,197,64,.4)}
+.sp-h2{font-family:'Baloo 2',sans-serif;font-size:28px;font-weight:700;color:var(--teal);line-height:1}
+.sp-sub{font-size:16px;line-height:1.8;color:var(--dim);max-width:340px;margin-top:2px}
+#gobtn{margin-top:14px;padding:22px 64px;background:radial-gradient(circle at 38% 38%,#ffdf70,var(--gold2));color:var(--surf);border:none;cursor:pointer;border-radius:60px;font-family:'Baloo 2',sans-serif;font-size:28px;font-weight:800;letter-spacing:2px;box-shadow:0 6px 36px rgba(245,197,64,.35);transition:transform .12s}
+#gobtn:active{transform:scale(.94)}#gobtn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+#status-card{margin-top:12px;max-width:360px;width:100%;border-radius:16px;overflow:hidden;display:none;text-align:left}
 #status-card.show{display:block}
-.sc-ok{background:#0a1f14;border:1.5px solid #1a4030;}
-.sc-warn{background:#1a1408;border:1.5px solid #3a2a10;}
-.sc-err{background:#1a0c0a;border:1.5px solid #3a1818;}
-.sc-inner{padding:14px 16px;}
-.sc-title{font-family:'Baloo 2',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
-.sc-ok .sc-title{color:var(--green)}
-.sc-warn .sc-title{color:var(--gold)}
-.sc-err .sc-title{color:#e06050}
-.sc-body{font-size:12px;line-height:1.7;color:var(--dim);}
-.sc-body b{color:var(--text);font-weight:700;}
-.sc-body ol{margin:6px 0 0 18px;}
-.sc-body li{margin-bottom:3px;}
-.sc-body code{
-  background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;
-  font-size:11px;font-family:monospace;color:var(--teal);
-}
+.sc-warn{background:#1a1408;border:1.5px solid #3a2a10}.sc-err{background:#1a0c0a;border:1.5px solid #3a1818}
+.sc-inner{padding:14px 16px}
+.sc-title{font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.sc-warn .sc-title{color:var(--gold)}.sc-err .sc-title{color:#e06050}
+.sc-body{font-size:13px;line-height:1.7;color:var(--dim)}.sc-body b{color:var(--text);font-weight:700}.sc-body ol{margin:6px 0 0 18px}.sc-body li{margin-bottom:3px}
+.sc-body code{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;font-size:12px;font-family:monospace;color:var(--teal)}
+.serve-tip{margin-top:10px;padding:10px 14px;border-radius:12px;background:rgba(245,197,64,.06);border:1px solid rgba(245,197,64,.15);font-size:12px;line-height:1.7;color:var(--dim)}.serve-tip b{color:var(--gold);font-weight:700}
 
-/* Serve-it helper */
-.serve-tip{
-  margin-top:10px;padding:10px 14px;border-radius:12px;
-  background:rgba(245,197,64,.06);border:1px solid rgba(245,197,64,.15);
-  font-size:11px;line-height:1.7;color:var(--dim);
-}
-.serve-tip b{color:var(--gold);font-weight:700;}
-
-/* ── GALLERY BUTTON (header) ── */
-.gal-btn{
-  background:var(--surf2);border:1.5px solid #1e3c2a;color:var(--dim);
-  cursor:pointer;padding:6px 10px;border-radius:10px;
-  font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;
-  letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;gap:4px;
-  transition:all .18s;white-space:nowrap;
-}
-.gal-btn .gal-count{
-  background:var(--gold2);color:var(--bg);font-size:9px;
-  padding:1px 5px;border-radius:8px;min-width:18px;text-align:center;
-  font-weight:800;
-}
-.gal-btn:active{transform:scale(.94)}
-
-/* ── GALLERY MODAL ── */
-#gallery{position:fixed;inset:0;z-index:60;background:var(--bg);display:none;flex-direction:column;overflow:hidden;}
+#gallery{position:fixed;inset:0;z-index:60;background:var(--bg);display:none;flex-direction:column;overflow:hidden}
 #gallery.open{display:flex}
-#gal-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px 8px;background:var(--surf);
-  border-bottom:2.5px solid var(--gold2);flex-shrink:0;
-}
-.gal-title{font-family:'Baloo 2',sans-serif;font-size:19px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:6px;}
-.gal-subtitle{font-size:8px;color:var(--dim);font-weight:800;letter-spacing:1px;text-transform:uppercase;}
-#gal-close{
-  background:none;border:1.5px solid #1e3c2a;color:var(--dim);
-  cursor:pointer;padding:8px 14px;border-radius:10px;
-  font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;
-  letter-spacing:.5px;text-transform:uppercase;transition:all .18s;
-}
+#gal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;background:var(--surf);border-bottom:3px solid var(--gold2);flex-shrink:0}
+.gal-title{font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:8px}
+.gal-subtitle{font-size:11px;color:var(--dim);font-weight:800;letter-spacing:1px;text-transform:uppercase}
+#gal-close{background:var(--surf2);border:2px solid #1e3c2a;color:var(--dim);cursor:pointer;padding:14px 22px;border-radius:14px;font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:700;transition:all .18s}
+#gal-grid{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:14px;align-items:center;overscroll-behavior:contain}
+#gal-grid::-webkit-scrollbar{width:4px}#gal-grid::-webkit-scrollbar-thumb{background:var(--dim);border-radius:4px}
+.gal-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:60px 20px;text-align:center}
+.gal-empty-icon{font-size:56px;opacity:.3}.gal-empty-text{font-size:18px;color:var(--dim);line-height:1.6}
+.gal-item{position:relative;border-radius:14px;overflow:hidden;background:#0a0a0a;width:100%;max-width:420px;cursor:pointer;transition:transform .12s}
+.gal-item:active{transform:scale(.97)}
+.gal-item img{width:100%;display:block}
+.gal-item-overlay{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:30px 10px 10px}
+.gal-item-time{font-size:14px;font-weight:800;color:rgba(255,255,255,.6)}
+.gal-del-btn{background:rgba(224,72,72,.2);color:#e06050;border:2px solid #3a1818;padding:12px 18px;border-radius:14px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:700;display:flex;align-items:center;gap:5px;transition:all .12s}
+.gal-del-btn:active{transform:scale(.92)}
 
-#gal-grid{
-  flex:1;overflow-y:auto;padding:8px;
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;
-  align-content:start;overscroll-behavior:contain;
-}
-#gal-grid::-webkit-scrollbar{width:4px}
-#gal-grid::-webkit-scrollbar-thumb{background:var(--dim);border-radius:4px}
-.gal-empty{
-  grid-column:1/-1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:8px;
-  padding:60px 20px;text-align:center;
-}
-.gal-empty-icon{font-size:48px;opacity:.3}
-.gal-empty-text{font-size:13px;color:var(--dim);line-height:1.6}
-.gal-item{
-  position:relative;border-radius:12px;overflow:hidden;
-  background:#0a0a0a;aspect-ratio:3/4;cursor:pointer;
-  transition:transform .12s;
-}
-.gal-item:active{transform:scale(.96)}
-.gal-item img{width:100%;height:100%;object-fit:cover;display:block;}
-.gal-item-actions{
-  position:absolute;bottom:0;left:0;right:0;
-  display:flex;gap:0;
-  background:linear-gradient(transparent,rgba(0,0,0,.85));
-  padding:24px 6px 6px;
-}
-.gal-item-btn{
-  flex:1;padding:8px 4px;border:none;cursor:pointer;
-  font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;
-  letter-spacing:.3px;text-transform:uppercase;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;gap:3px;
-  transition:all .12s;
-}
-.gal-item-btn:active{transform:scale(.92)}
-.gal-share{background:rgba(24,200,160,.2);color:var(--teal)}
-.gal-del{background:rgba(224,72,72,.15);color:#e06050}
-.gal-item-time{
-  position:absolute;top:6px;left:6px;
-  font-size:8px;font-weight:800;letter-spacing:.5px;
-  color:rgba(255,255,255,.6);background:rgba(0,0,0,.5);
-  padding:2px 6px;border-radius:6px;
-}
-
-/* ── PREVIEW MODAL (full screen single image) ── */
-#preview{position:fixed;inset:0;z-index:70;background:rgba(4,18,13,.95);display:none;flex-direction:column;align-items:center;justify-content:center;}
+#preview{position:fixed;inset:0;z-index:70;background:rgba(4,18,13,.97);display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px}
 #preview.open{display:flex}
-#preview img{max-width:92%;max-height:75vh;border-radius:12px;object-fit:contain;}
-#preview-actions{display:flex;gap:10px;margin-top:14px;}
-.prev-btn{
-  padding:12px 24px;border-radius:14px;cursor:pointer;
-  font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:700;
-  display:flex;align-items:center;gap:6px;transition:transform .12s;border:none;
-}
+#preview img{max-width:96%;max-height:72vh;border-radius:14px;object-fit:contain}
+#preview-actions{display:flex;gap:14px;margin-top:18px}
+.prev-btn{padding:18px 32px;border-radius:18px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-size:22px;font-weight:700;display:flex;align-items:center;gap:8px;transition:transform .12s;border:none}
 .prev-btn:active{transform:scale(.94)}
-.prev-share{background:var(--teal2);color:#fff}
-.prev-close{background:var(--surf2);color:var(--dim);border:1.5px solid #1e3c2a;}
-.prev-del{background:rgba(224,72,72,.15);color:#e06050;border:1.5px solid #3a1818;}
-
-@media print {
-  body *{visibility:hidden !important}
-  #printarea,#printarea *{visibility:visible !important}
-  #printarea{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:white}
-}
-#printarea{display:none}
+.prev-close{background:var(--surf2);color:var(--dim);border:2px solid #1e3c2a}
+.prev-del{background:rgba(224,72,72,.15);color:#e06050;border:2px solid #3a1818}
 </style>
 </head>
 <body>
-
-<!-- ── STAR FIELD ── -->
 <div id="starfield"></div>
 
-<!-- ── SPLASH ── -->
 <div id="splash">
   <span class="sp-deco" style="top:8%;left:6%;animation-duration:2.8s">⭐</span>
   <span class="sp-deco" style="top:12%;right:8%;animation-duration:3.5s;font-size:28px">🌟</span>
   <span class="sp-deco" style="top:30%;left:3%;animation-duration:4s">✨</span>
   <span class="sp-deco" style="bottom:25%;right:5%;animation-duration:2.2s">⭐</span>
   <span class="sp-deco" style="bottom:15%;left:8%;animation-duration:3.1s;font-size:26px">🌙</span>
-  <span class="sp-deco" style="top:20%;left:30%;animation-duration:4.4s">🌺</span>
-  <span class="sp-deco" style="bottom:30%;right:12%;animation-duration:3.8s">🪔</span>
-  <span class="sp-deco" style="top:60%;left:2%;animation-duration:2.6s;font-size:16px">✨</span>
-
   <span class="sp-moon">🌙</span>
   <h1 class="sp-h1">Eid Mubarak!</h1>
   <h2 class="sp-h2">Photo Booth 📸</h2>
@@ -445,65 +175,36 @@ header{
   <div id="status-card"></div>
 </div>
 
-<!-- ── MAIN APP ── -->
 <div id="app">
   <header>
-    <div class="logo">
-      <span class="logo-moon">🌙</span>
-      <div class="logo-text">
-        <span class="logo-main">Eid Booth</span>
-        <span class="logo-sub">Photo Booth</span>
-      </div>
-    </div>
-    <div class="shots-wrap">
+    <div class="logo"><span class="logo-moon">🌙</span><div><span class="logo-main">Eid Booth</span><span class="logo-sub">Photo Booth</span></div></div>
+    <div class="hdr-right">
       <button class="gal-btn" onclick="openGallery()">📁 <span class="gal-count" id="gal-count">0</span></button>
-      <div class="dots">
-        <div class="dot" id="d0"></div>
-        <div class="dot" id="d1"></div>
-        <div class="dot" id="d2"></div>
-        <div class="dot" id="d3"></div>
-      </div>
+      <div class="dots"><div class="dot" id="d0"></div><div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div></div>
     </div>
   </header>
-
   <div id="vf">
     <video id="vid" autoplay playsinline muted class="f-sunny"></video>
     <div id="vig"></div>
-    <div class="orn tl">⭐</div>
-    <div class="orn tr">🌙</div>
-    <div class="orn bl">✨</div>
-    <div class="orn br">⭐</div>
-    <div id="cdown">
-      <span id="cnum">3</span>
-      <div class="cdown-label">Get ready!</div>
-    </div>
+    <div class="orn tl">⭐</div><div class="orn tr">🌙</div><div class="orn bl">✨</div><div class="orn br">⭐</div>
+    <div id="cdown"><span id="cnum">3</span><div class="cdown-label">Get ready!</div></div>
     <div id="flash"></div>
   </div>
-
   <div id="fbar">
-    <button class="fb on" data-f="sunny"    onclick="setF(this)"><span class="fi">☀️</span>Sunny</button>
-    <button class="fb"    data-f="moon"     onclick="setF(this)"><span class="fi">🌑</span>Moon</button>
-    <button class="fb"    data-f="golden"   onclick="setF(this)"><span class="fi">✨</span>Golden</button>
-    <button class="fb"    data-f="twilight" onclick="setF(this)"><span class="fi">🌊</span>Twilight</button>
-    <button class="fb"    data-f="vintage"  onclick="setF(this)"><span class="fi">📜</span>Classic</button>
-    <button class="fb"    data-f="festival" onclick="setF(this)"><span class="fi">🎆</span>Festival</button>
+    <button class="fb on" data-f="sunny" onclick="setF(this)"><span class="fi">☀️</span>Sunny</button>
+    <button class="fb" data-f="moon" onclick="setF(this)"><span class="fi">🌑</span>Moon</button>
+    <button class="fb" data-f="golden" onclick="setF(this)"><span class="fi">✨</span>Golden</button>
+    <button class="fb" data-f="twilight" onclick="setF(this)"><span class="fi">🌊</span>Twilight</button>
+    <button class="fb" data-f="vintage" onclick="setF(this)"><span class="fi">📜</span>Classic</button>
+    <button class="fb" data-f="festival" onclick="setF(this)"><span class="fi">🎆</span>Festival</button>
   </div>
-
   <div id="ctrl">
     <div class="ctrl-side">
-      <button class="cbtn on" id="bstrip" onclick="setLayout('strip')" title="Strip">
-        <svg viewBox="0 0 16 20"><rect x="0" y="0" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="6" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="12" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="18" width="16" height="2" rx="1" fill="currentColor"/></svg>
-      </button>
-      <button class="cbtn" id="bgrid" onclick="setLayout('grid')" title="Grid">
-        <svg viewBox="0 0 18 18"><rect x="0" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="0" y="10" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="10" width="8" height="8" rx="1.5" fill="currentColor"/></svg>
-      </button>
+      <button class="cbtn on" id="bstrip" onclick="setLayout('strip')"><svg viewBox="0 0 16 20"><rect x="0" y="0" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="6" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="12" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="18" width="16" height="2" rx="1" fill="currentColor"/></svg></button>
+      <button class="cbtn" id="bgrid" onclick="setLayout('grid')"><svg viewBox="0 0 18 18"><rect x="0" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="0" y="10" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="10" width="8" height="8" rx="1.5" fill="currentColor"/></svg></button>
       <button id="flipbtn" onclick="flipCam()">&#8635;</button>
     </div>
-
-    <button id="shutbtn" onclick="shoot()">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="5" fill="none" stroke="rgba(6,28,20,.5)" stroke-width="1.5"/></svg>
-    </button>
-
+    <button id="shutbtn" onclick="shoot()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="5" fill="none" stroke="rgba(6,28,20,.5)" stroke-width="1.5"/></svg></button>
     <div class="ctrl-side-r">
       <button class="abtn hi" id="viewbtn" onclick="openDecorate()" style="display:none">🎨 DECORATE</button>
       <button class="abtn" onclick="resetAll()">RESET</button>
@@ -511,946 +212,200 @@ header{
   </div>
 </div>
 
-<!-- ── DECORATE MODAL ── -->
 <div id="dec">
   <div id="dec-head">
-    <div style="display:flex;flex-direction:column;gap:1px">
-      <div class="dec-ht">🎨 Decorate!</div>
-      <div class="dec-hs">Tap stickers to add them</div>
-    </div>
+    <div><div class="dec-ht">🎨 Decorate!</div><div class="dec-hs">Tap stickers to add them</div></div>
     <div class="dec-layout">
-      <button class="dlbtn on" id="dl-strip" onclick="setLayout('strip')" title="Strip">
-        <svg viewBox="0 0 16 20"><rect x="0" y="0" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="6" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="12" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="18" width="16" height="2" rx="1" fill="currentColor"/></svg>
-      </button>
-      <button class="dlbtn" id="dl-grid" onclick="setLayout('grid')" title="Grid">
-        <svg viewBox="0 0 18 18"><rect x="0" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="0" y="10" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="10" width="8" height="8" rx="1.5" fill="currentColor"/></svg>
-      </button>
+      <button class="dlbtn on" id="dl-strip" onclick="setLayout('strip')"><svg viewBox="0 0 16 20"><rect x="0" y="0" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="6" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="12" width="16" height="4" rx="1.5" fill="currentColor"/><rect x="0" y="18" width="16" height="2" rx="1" fill="currentColor"/></svg></button>
+      <button class="dlbtn" id="dl-grid" onclick="setLayout('grid')"><svg viewBox="0 0 18 18"><rect x="0" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="0" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="0" y="10" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="10" y="10" width="8" height="8" rx="1.5" fill="currentColor"/></svg></button>
     </div>
     <button id="dec-clear" onclick="clearStickers()">🗑 CLEAR</button>
   </div>
-
-  <div id="dec-photos">
-    <div class="dc"><canvas id="dc0"></canvas></div>
-    <div class="dc"><canvas id="dc1"></canvas></div>
-    <div class="dc"><canvas id="dc2"></canvas></div>
-    <div class="dc"><canvas id="dc3"></canvas></div>
-  </div>
-
+  <div id="dec-photos"><div class="dc"><canvas id="dc0"></canvas></div><div class="dc"><canvas id="dc1"></canvas></div><div class="dc"><canvas id="dc2"></canvas></div><div class="dc"><canvas id="dc3"></canvas></div></div>
   <div id="sbar">
     <div class="srow">
-      <button class="sk" onclick="addSticker('🌙')">🌙</button>
-      <button class="sk" onclick="addSticker('⭐')">⭐</button>
-      <button class="sk" onclick="addSticker('🌟')">🌟</button>
-      <button class="sk" onclick="addSticker('✨')">✨</button>
-      <button class="sk" onclick="addSticker('🕌')">🕌</button>
-      <button class="sk" onclick="addSticker('🪔')">🪔</button>
-      <button class="sk" onclick="addSticker('🌺')">🌺</button>
-      <button class="sk" onclick="addSticker('💫')">💫</button>
-      <button class="sk magic" onclick="surprise()">🎲 SURPRISE!</button>
+      <button class="sk" onclick="addSticker('🌙')">🌙</button><button class="sk" onclick="addSticker('⭐')">⭐</button><button class="sk" onclick="addSticker('🌟')">🌟</button><button class="sk" onclick="addSticker('✨')">✨</button><button class="sk" onclick="addSticker('🕌')">🕌</button><button class="sk" onclick="addSticker('🪔')">🪔</button><button class="sk" onclick="addSticker('🌺')">🌺</button><button class="sk" onclick="addSticker('💫')">💫</button><button class="sk magic" onclick="surprise()">🎲 SURPRISE!</button>
     </div>
     <div class="srow">
-      <button class="sk" onclick="addSticker('🎉')">🎉</button>
-      <button class="sk" onclick="addSticker('🎊')">🎊</button>
-      <button class="sk" onclick="addSticker('🎈')">🎈</button>
-      <button class="sk" onclick="addSticker('👑')">👑</button>
-      <button class="sk" onclick="addSticker('🦋')">🦋</button>
-      <button class="sk" onclick="addSticker('🌈')">🌈</button>
-      <button class="sk" onclick="addSticker('🥳')">🥳</button>
-      <button class="sk" onclick="addSticker('🤩')">🤩</button>
-      <button class="sk" onclick="addSticker('😄')">😄</button>
-      <button class="sk" onclick="addSticker('🎁')">🎁</button>
-      <button class="sk" onclick="addSticker('🌸')">🌸</button>
-      <button class="sk" onclick="addSticker('🦄')">🦄</button>
+      <button class="sk" onclick="addSticker('🎉')">🎉</button><button class="sk" onclick="addSticker('🎊')">🎊</button><button class="sk" onclick="addSticker('🎈')">🎈</button><button class="sk" onclick="addSticker('👑')">👑</button><button class="sk" onclick="addSticker('🦋')">🦋</button><button class="sk" onclick="addSticker('🌈')">🌈</button><button class="sk" onclick="addSticker('🥳')">🥳</button><button class="sk" onclick="addSticker('🤩')">🤩</button><button class="sk" onclick="addSticker('😄')">😄</button><button class="sk" onclick="addSticker('🎁')">🎁</button><button class="sk" onclick="addSticker('🌸')">🌸</button><button class="sk" onclick="addSticker('🦄')">🦄</button>
     </div>
   </div>
-
   <div id="dec-actions">
     <button class="da retake" onclick="resetAll()">↩ RETAKE</button>
     <button class="da save" onclick="saveStrip()">💾 SAVE</button>
-    <button class="da save" onclick="saveAndShare()" style="background:radial-gradient(circle at 38% 38%,#30e8b8,var(--teal2))">📤 SHARE</button>
   </div>
 </div>
 
-<!-- ── GALLERY MODAL ── -->
 <div id="gallery">
   <div id="gal-head">
-    <div style="display:flex;flex-direction:column;gap:1px">
-      <div class="gal-title">📁 Gallery</div>
-      <div class="gal-subtitle">All saved photo strips</div>
-    </div>
-    <button id="gal-close" onclick="closeGallery()">✕ CLOSE</button>
+    <div><div class="gal-title">📁 Our Photos</div><div class="gal-subtitle">Tap any photo to view it big</div></div>
+    <button id="gal-close" onclick="closeGallery()">✕ Close</button>
   </div>
   <div id="gal-grid"></div>
 </div>
 
-<!-- ── PREVIEW MODAL ── -->
 <div id="preview">
   <img id="preview-img" src="">
   <div id="preview-actions">
-    <button class="prev-btn prev-share" onclick="sharePreview()">📤 Share</button>
     <button class="prev-btn prev-del" onclick="deletePreview()">🗑 Delete</button>
     <button class="prev-btn prev-close" onclick="closePreview()">✕ Close</button>
   </div>
 </div>
 
-<!-- Toast -->
 <div id="toast">✅ Saved!</div>
-<div id="printarea"></div>
 
 <script>
-// ─── DOM refs ───────────────────────────────────────────
-var vid       = document.getElementById('vid');
-var flash     = document.getElementById('flash');
-var cdown     = document.getElementById('cdown');
-var cnum      = document.getElementById('cnum');
-var shutbtn   = document.getElementById('shutbtn');
-var viewbtn   = document.getElementById('viewbtn');
-var statusCard = document.getElementById('status-card');
-var gobtn     = document.getElementById('gobtn');
-var toast     = document.getElementById('toast');
+var vid=document.getElementById('vid'),flash=document.getElementById('flash'),cdown=document.getElementById('cdown'),cnum=document.getElementById('cnum'),shutbtn=document.getElementById('shutbtn'),viewbtn=document.getElementById('viewbtn'),statusCard=document.getElementById('status-card'),gobtn=document.getElementById('gobtn'),toast=document.getElementById('toast');
+var myStream=null,facing='user',curFilter='sunny',layout='strip',photos=[],layers=[[],[],[],[]],busy=false;
+var CSS_FILTERS={'sunny':'none','moon':'grayscale(1) contrast(1.1)','golden':'sepia(.45) saturate(1.35) brightness(1.06)','twilight':'hue-rotate(195deg) saturate(.9) brightness(1.04)','vintage':'sepia(.65) contrast(.88) brightness(.94) saturate(.75)','festival':'contrast(1.45) saturate(1.4) brightness(.88)'};
 
-// ─── State ──────────────────────────────────────────────
-var myStream  = null;
-var facing    = 'user';
-var curFilter = 'sunny';
-var layout    = 'strip';
-var photos    = [];
-var layers    = [[],[],[],[]];
-var busy      = false;
+(function(){var sf=document.getElementById('starfield'),ch=['⭐','🌟','✨','💫','⭐','✨'];for(var i=0;i<18;i++){var s=document.createElement('span');s.className='sf-star';s.textContent=ch[i%ch.length];s.style.left=(Math.random()*96)+'%';s.style.top=(Math.random()*96)+'%';s.style.fontSize=(10+Math.random()*14)+'px';s.style.animationDuration=(2.5+Math.random()*4)+'s';s.style.animationDelay=(Math.random()*4)+'s';sf.appendChild(s);}})();
 
-var CSS_FILTERS = {
-  'sunny':    'none',
-  'moon':     'grayscale(1) contrast(1.1)',
-  'golden':   'sepia(.45) saturate(1.35) brightness(1.06)',
-  'twilight': 'hue-rotate(195deg) saturate(.9) brightness(1.04)',
-  'vintage':  'sepia(.65) contrast(.88) brightness(.94) saturate(.75)',
-  'festival': 'contrast(1.45) saturate(1.4) brightness(.88)'
-};
+function showStatus(t,title,body){statusCard.className='sc-'+t+' show';statusCard.id='status-card';statusCard.innerHTML='<div class="sc-inner"><div class="sc-title">'+title+'</div><div class="sc-body">'+body+'</div></div>';}
+(function(){if(location.protocol==='file:'){showStatus('warn','⚠️ Local File','<b>Chrome blocks camera on local files.</b><div class="serve-tip"><b>Fix:</b> Run <code>python3 -m http.server 8080</code> on laptop, open <code>http://LAPTOP_IP:8080</code> on tablet.</div>');gobtn.textContent='TRY ANYWAY ✨';}if(navigator.permissions&&navigator.permissions.query){navigator.permissions.query({name:'camera'}).then(function(r){if(r.state==='denied')showStatus('err','🚫 Camera Blocked','Tap 🔒 in address bar → Site settings → Camera → <b>Allow</b> → Reload.');r.onchange=function(){if(r.state==='granted'){statusCard.className='';statusCard.innerHTML='';gobtn.disabled=false;gobtn.textContent="LET'S GO! ✨";}};}).catch(function(){});}})();
 
-// ─── Starfield ──────────────────────────────────────────
-(function() {
-  var sf = document.getElementById('starfield');
-  var chars = ['⭐','🌟','✨','💫','⭐','✨'];
-  for (var i = 0; i < 18; i++) {
-    var s = document.createElement('span');
-    s.className = 'sf-star';
-    s.textContent = chars[i % chars.length];
-    s.style.left = (Math.random()*96) + '%';
-    s.style.top  = (Math.random()*96) + '%';
-    s.style.fontSize = (10 + Math.random()*14) + 'px';
-    s.style.animationDuration = (2.5 + Math.random()*4) + 's';
-    s.style.animationDelay    = (Math.random()*4) + 's';
-    sf.appendChild(s);
-  }
-})();
+function startCam(){gobtn.disabled=true;gobtn.textContent='STARTING...';statusCard.className='';statusCard.innerHTML='';if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){showStatus('err','🚫 No Camera','Use <b>Chrome</b> on your tablet.');gobtn.disabled=false;gobtn.textContent='TRY AGAIN ✨';return;}navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1280},height:{ideal:720}},audio:false}).then(camOk).catch(function(e){if(e.name==='OverconstrainedError')return navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false}).then(camOk);throw e;}).catch(camFail);}
+function camOk(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play().then(function(){document.getElementById('splash').style.display='none';}).catch(function(){document.getElementById('splash').style.display='none';});};setTimeout(function(){document.getElementById('splash').style.display='none';},3000);}
+function camFail(e){gobtn.disabled=false;gobtn.textContent='TRY AGAIN ✨';var m={'NotAllowedError':['🚫 Permission Denied','Tap <b>🔒 lock icon</b> → Permissions → Camera → <b>Allow</b> → TRY AGAIN.'],'NotFoundError':['📷 No Camera','No camera detected.'],'NotReadableError':['⚠️ Camera Busy','Close other camera apps.'],'SecurityError':['🔒 Needs HTTPS','<div class="serve-tip">Run <code>python3 -m http.server 8080</code> on laptop.</div>']};var p=m[e.name];if(p)showStatus('err',p[0],p[1]);else showStatus('err','❌ Error','<b>'+e.name+'</b>: '+e.message);}
 
-// ─── Protocol & permission diagnostics ──────────────────
-function isSecureContext() {
-  // Check if we're in a context that allows getUserMedia
-  if (window.isSecureContext !== undefined) return window.isSecureContext;
-  var proto = location.protocol;
-  return proto === 'https:' || proto === 'chrome-extension:' ||
-         location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+function setF(b){document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');curFilter=b.dataset.f;vid.className='f-'+curFilter;}
+function setLayout(l){layout=l;['bstrip','bgrid'].forEach(function(id){document.getElementById(id).classList.toggle('on',(id==='bstrip')===(l==='strip'));});['dl-strip','dl-grid'].forEach(function(id){document.getElementById(id).classList.toggle('on',(id==='dl-strip')===(l==='strip'));});}
+function flipCam(){facing=(facing==='user')?'environment':'user';vid.style.transform=(facing==='user')?'scaleX(-1)':'scaleX(1)';if(myStream)myStream.getTracks().forEach(function(t){t.stop();});navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false}).then(function(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play();};}).catch(function(e){console.error('flip',e);});}
+function updateDots(){for(var i=0;i<4;i++){var d=document.getElementById('d'+i);d.className='dot';if(i<photos.length)d.classList.add('lit');else if(i===photos.length&&busy)d.classList.add('live');}}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function doCountdown(){var lbl=document.querySelector('.cdown-label'),msgs=['Say cheese! 🧀','Get ready! 📸','Strike a pose! 💃','Smile big! 😄'];return new Promise(function(res){cdown.classList.add('show');if(lbl)lbl.textContent=msgs[photos.length]||msgs[0];var n=3;function tick(){cnum.textContent=n;cnum.classList.remove('pop');void cnum.offsetWidth;cnum.classList.add('pop');if(n<=1){setTimeout(function(){cdown.classList.remove('show');res();},880);return;}n--;setTimeout(tick,960);}tick();});}
+
+function grabFrame(){return new Promise(function(res){flash.classList.remove('go');void flash.offsetWidth;flash.classList.add('go');var vw=vid.videoWidth,vh=vid.videoHeight;if(!vw||!vh){res(null);return;}var sc=1,MAX=1280;if(Math.max(vw,vh)>MAX)sc=MAX/Math.max(vw,vh);var w=Math.round(vw*sc),h=Math.round(vh*sc);var c=document.createElement('canvas');c.width=w;c.height=h;var ctx=c.getContext('2d');var f=CSS_FILTERS[curFilter]||'none';if(typeof ctx.filter!=='undefined')ctx.filter=f;if(facing==='user'){ctx.translate(w,0);ctx.scale(-1,1);}ctx.drawImage(vid,0,0,w,h);ctx.setTransform(1,0,0,1,0,0);if(typeof ctx.filter!=='undefined')ctx.filter='none';var vg=ctx.createRadialGradient(w/2,h/2,h*.26,w/2,h/2,h*.72);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.44)');ctx.fillStyle=vg;ctx.fillRect(0,0,w,h);try{c.toBlob(function(blob){if(!blob){try{res(c.toDataURL('image/jpeg',.88));}catch(e2){res(null);}return;}res(URL.createObjectURL(blob));},'image/jpeg',.88);}catch(e){try{res(c.toDataURL('image/jpeg',.88));}catch(e2){res(null);}}});}
+
+async function shoot(){if(busy||!myStream)return;if(photos.length>=4){openDecorate();return;}busy=true;shutbtn.classList.add('busy');while(photos.length<4){updateDots();await doCountdown();var u=await grabFrame();if(u)photos.push(u);updateDots();await sleep(380);}busy=false;shutbtn.classList.remove('busy');updateDots();viewbtn.style.display='block';openDecorate();}
+
+var decCanvases=[document.getElementById('dc0'),document.getElementById('dc1'),document.getElementById('dc2'),document.getElementById('dc3')];
+function openDecorate(){if(!photos.length)return;document.getElementById('dec').classList.add('open');setTimeout(function(){for(var i=0;i<photos.length;i++)renderCanvas(i);},200);}
+function renderCanvas(idx){var c=decCanvases[idx];if(!c||!photos[idx])return;var rect=c.parentElement.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2),cw=Math.floor(rect.width*dpr),ch=Math.floor(rect.height*dpr);if(cw<2||ch<2)return;c.width=cw;c.height=ch;var ctx=c.getContext('2d');ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,cw,ch);var img=new Image();img.crossOrigin='anonymous';img.onload=function(){var iw=img.naturalWidth,ih=img.naturalHeight,s=Math.min(cw/iw,ch/ih),dw=iw*s,dh=ih*s;ctx.drawImage(img,(cw-dw)/2,(ch-dh)/2,dw,dh);drawStickers(ctx,idx,cw,ch);};img.onerror=function(){ctx.fillStyle='#4a8068';ctx.font=(Math.min(cw,ch)*.15)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('📷',cw/2,ch/2);};img.src=photos[idx];}
+function drawStickers(ctx,idx,w,h){layers[idx].forEach(function(s){ctx.save();ctx.translate(s.xf*w,s.yf*h);ctx.rotate(s.r*Math.PI/180);ctx.font=(s.sf*Math.min(w,h))+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.e,0,0);ctx.restore();});}
+function addSticker(emoji){for(var i=0;i<4;i++){if(!photos[i])continue;layers[i].push({e:emoji,xf:.1+Math.random()*.8,yf:.1+Math.random()*.8,sf:.08+Math.random()*.09,r:(Math.random()-.5)*52});renderCanvas(i);}document.querySelectorAll('.dc').forEach(function(el){el.classList.add('tapped');setTimeout(function(){el.classList.remove('tapped');},320);});}
+var ALL_STICKERS=['🌙','⭐','🌟','✨','🕌','🪔','🌺','💫','🎉','🎊','🎈','👑','🦋','🌈','🥳','🤩','😄','🎁','🌸'];
+function surprise(){var c=3+Math.floor(Math.random()*4);for(var s=0;s<c;s++){var em=ALL_STICKERS[Math.floor(Math.random()*ALL_STICKERS.length)];for(var i=0;i<4;i++){if(!photos[i])continue;layers[i].push({e:em,xf:.08+Math.random()*.84,yf:.08+Math.random()*.84,sf:.07+Math.random()*.1,r:(Math.random()-.5)*60});}}for(var j=0;j<4;j++)renderCanvas(j);}
+function clearStickers(){layers=[[],[],[],[]];for(var i=0;i<4;i++)renderCanvas(i);}
+
+// ══════════════════════════════════════════════════════════
+// 4×6 PRINT (1200×1800) — Festive Eid al-Fitr Frame
+// ══════════════════════════════════════════════════════════
+function saveStrip(){
+  if(!photos.length)return;
+  var isGrid=layout==='grid',imgs=[],loaded=0,failed=0;
+  photos.forEach(function(url,i){var img=new Image();img.crossOrigin='anonymous';img.onload=function(){imgs[i]=img;loaded++;if(loaded+failed===photos.length&&loaded>0)compose(imgs,isGrid);};img.onerror=function(){failed++;if(loaded+failed===photos.length&&loaded>0)compose(imgs,isGrid);};img.src=url;});
 }
 
-function showStatus(type, title, body) {
-  statusCard.className = 'sc-' + type + ' show';
-  statusCard.id = 'status-card';
-  statusCard.innerHTML = '<div class="sc-inner"><div class="sc-title">' + title + '</div><div class="sc-body">' + body + '</div></div>';
-}
+function compose(imgs,isGrid){
+  var W=1200,H=1800;
+  var c=document.createElement('canvas');c.width=W;c.height=H;
+  var ctx=c.getContext('2d');
 
-// Run a pre-flight check on page load
-(function preflight() {
-  var proto = location.protocol;
+  // Warm cream background
+  ctx.fillStyle='#fffaee';ctx.fillRect(0,0,W,H);
 
-  // If opened from file://, show a helpful warning immediately
-  if (proto === 'file:') {
-    showStatus('warn', '⚠️ Local File Detected',
-      '<b>Chrome blocks camera access on local files.</b> ' +
-      'You need to serve this page over a local network for the camera to work.' +
-      '<div class="serve-tip">' +
-      '<b>Easiest fix — use your laptop to host it:</b>' +
-      '<ol>' +
-      '<li>On your laptop, open a terminal in the folder with this file</li>' +
-      '<li>Run: <code>python3 -m http.server 8080</code></li>' +
-      '<li>Find your laptop\'s IP (e.g. <code>192.168.1.x</code>)</li>' +
-      '<li>On the tablet, open Chrome and go to:<br><code>http://192.168.1.x:8080/photobooth.html</code></li>' +
-      '</ol>' +
-      '</div>'
-    );
-    gobtn.textContent = 'TRY ANYWAY ✨';
-  }
+  // Subtle dot pattern
+  ctx.fillStyle='rgba(200,136,12,.06)';
+  for(var gx=14;gx<W;gx+=24)for(var gy=14;gy<H;gy+=24){ctx.beginPath();ctx.arc(gx,gy,1.2,0,Math.PI*2);ctx.fill();}
 
-  // If HTTPS or localhost, check permission state proactively
-  if (navigator.permissions && navigator.permissions.query) {
-    navigator.permissions.query({ name: 'camera' }).then(function(result) {
-      if (result.state === 'denied') {
-        showStatus('err', '🚫 Camera Blocked',
-          'Camera permission was previously denied.<br>' +
-          '<b>To fix:</b> Tap the 🔒 icon in Chrome\'s address bar → ' +
-          'Site settings → Camera → <b>Allow</b> → Reload the page.'
-        );
-      }
-      // Listen for permission changes (user fixes it in settings)
-      result.onchange = function() {
-        if (result.state === 'granted') {
-          statusCard.className = '';
-          statusCard.innerHTML = '';
-          gobtn.disabled = false;
-          gobtn.textContent = "LET'S GO! ✨";
-        }
-      };
-    }).catch(function() { /* permissions API not available, that's ok */ });
-  }
-})();
+  // ── Ornamental double border
+  ctx.strokeStyle='#c8880c';ctx.lineWidth=6;rr(ctx,14,14,W-28,H-28,18);ctx.stroke();
+  ctx.strokeStyle='rgba(200,136,12,.3)';ctx.lineWidth=2;rr(ctx,26,26,W-52,H-52,12);ctx.stroke();
 
-// ─── Camera start ───────────────────────────────────────
-function startCam() {
-  gobtn.disabled = true;
-  gobtn.textContent = 'STARTING...';
-  statusCard.className = '';
-  statusCard.innerHTML = '';
+  // ── Corner emoji flourishes
+  ctx.font='32px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('✨',48,48);ctx.fillText('🌙',W-48,48);ctx.fillText('🌟',48,H-48);ctx.fillText('⭐',W-48,H-48);
 
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showStatus('err', '🚫 Camera Not Available',
-      'This browser doesn\'t support camera access.<br>' +
-      '<b>Use Chrome on your Samsung tablet</b> and make sure you\'re not in Incognito mode.'
-    );
-    gobtn.disabled = false;
-    gobtn.textContent = 'TRY AGAIN ✨';
-    return;
+  // ── Top decorative emoji row
+  ctx.font='20px serif';
+  ctx.fillText('🌙  ⭐  ✨  🕌  ✨  ⭐  🌙',W/2,72);
+
+  // ── Main title: Eid al-Fitr
+  ctx.fillStyle='#1a3a28';
+  ctx.font='800 68px "Baloo 2", sans-serif';
+  ctx.fillText('Eid al-Fitr',W/2,145);
+
+  // Crescent accents flanking title
+  ctx.font='42px serif';
+  ctx.fillText('🌙',140,142);ctx.fillText('🌙',W-140,142);
+
+  // ── Date
+  ctx.fillStyle='#c8880c';
+  ctx.font='700 34px "Baloo 2", sans-serif';
+  ctx.fillText('March 30, 2026',W/2,198);
+
+  // ── Gold divider line
+  ctx.fillStyle='#c8880c';
+  rr(ctx,80,222,W-160,3,2);ctx.fill();
+
+  // ── Second decorative emoji row below divider
+  ctx.font='16px serif';
+  ctx.fillText('🌺  💫  🎉  ✨  🎉  💫  🌺',W/2,250);
+
+  // ── Photo area
+  var pTop=270,pBot=H-110,pH=pBot-pTop,pad=44;
+
+  if(isGrid){
+    var gap=12,cW=Math.floor((W-pad*2-gap)/2),cH=Math.floor((pH-gap)/2);
+    imgs.forEach(function(img,i){if(!img)return;var col=i%2,row=Math.floor(i/2),ox=pad+col*(cW+gap),oy=pTop+row*(cH+gap);ctx.save();rr(ctx,ox,oy,cW,cH,14);ctx.clip();var iw=img.naturalWidth,ih=img.naturalHeight,sc=Math.max(cW/iw,cH/ih),dw=iw*sc,dh=ih*sc;ctx.drawImage(img,ox+(cW-dw)/2,oy+(cH-dh)/2,dw,dh);ctx.restore();ctx.strokeStyle='rgba(200,136,12,.3)';ctx.lineWidth=2;rr(ctx,ox,oy,cW,cH,14);ctx.stroke();layers[i].forEach(function(s){ctx.save();ctx.translate(ox+s.xf*cW,oy+s.yf*cH);ctx.rotate(s.r*Math.PI/180);ctx.font=(s.sf*Math.min(cW,cH))+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.e,0,0);ctx.restore();});});
+  }else{
+    var gap=10,cW=W-pad*2,cH=Math.floor((pH-gap*3)/4);
+    imgs.forEach(function(img,i){if(!img)return;var ox=pad,oy=pTop+i*(cH+gap);ctx.save();rr(ctx,ox,oy,cW,cH,14);ctx.clip();var iw=img.naturalWidth,ih=img.naturalHeight,sc=Math.max(cW/iw,cH/ih),dw=iw*sc,dh=ih*sc;ctx.drawImage(img,ox+(cW-dw)/2,oy+(cH-dh)/2,dw,dh);ctx.restore();ctx.strokeStyle='rgba(200,136,12,.3)';ctx.lineWidth=2;rr(ctx,ox,oy,cW,cH,14);ctx.stroke();layers[i].forEach(function(s){ctx.save();ctx.translate(ox+s.xf*cW,oy+s.yf*cH);ctx.rotate(s.r*Math.PI/180);ctx.font=(s.sf*Math.min(cW,cH))+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.e,0,0);ctx.restore();});});
   }
 
-  // Request camera with fallback constraints
-  var constraints = {
-    video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
-    audio: false
-  };
+  // ── Footer
+  ctx.textAlign='center';
+  ctx.fillStyle='#c8880c';ctx.font='24px serif';
+  ctx.fillText('🌙  ⭐  ✨  Eid Mubarak!  ✨  ⭐  🌙',W/2,H-68);
+  ctx.fillStyle='#8aaa90';ctx.font='600 18px "Nunito", sans-serif';
+  ctx.fillText('Photo Booth Memories',W/2,H-38);
 
-  navigator.mediaDevices.getUserMedia(constraints)
-    .then(handleCamSuccess)
-    .catch(function(err) {
-      // If ideal resolution fails, try with minimal constraints
-      if (err.name === 'OverconstrainedError' || err.name === 'ConstraintNotSatisfiedError') {
-        return navigator.mediaDevices.getUserMedia({ video: { facingMode: facing }, audio: false })
-          .then(handleCamSuccess);
-      }
-      throw err;
-    })
-    .catch(handleCamError);
+  // Save
+  try{c.toBlob(function(blob){if(!blob)return;saveToGallery(blob,function(){toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},3000);});var u=URL.createObjectURL(blob);var a=document.createElement('a');a.download='eid-photo-'+Date.now()+'.jpg';a.href=u;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},2000);},'image/jpeg',0.95);}catch(e){console.error(e);}
 }
 
-function handleCamSuccess(stream) {
-  myStream = stream;
-  vid.srcObject = stream;
-  vid.onloadedmetadata = function() {
-    vid.play().then(function() {
-      document.getElementById('splash').style.display = 'none';
-    }).catch(function() {
-      // Autoplay blocked — hide splash anyway, video will play on interaction
-      document.getElementById('splash').style.display = 'none';
-    });
-  };
-  // Safety timeout — if onloadedmetadata never fires
-  setTimeout(function() {
-    document.getElementById('splash').style.display = 'none';
-  }, 3000);
-}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
 
-function handleCamError(err) {
-  console.error('Camera error:', err.name, err.message);
-  gobtn.disabled = false;
-  gobtn.textContent = 'TRY AGAIN ✨';
-
-  switch (err.name) {
-    case 'NotAllowedError':
-      showStatus('err', '🚫 Permission Denied',
-        'Chrome needs your permission to use the camera.<br><br>' +
-        '<b>To fix this:</b>' +
-        '<ol>' +
-        '<li>Tap the <b>🔒 lock icon</b> in Chrome\'s address bar</li>' +
-        '<li>Tap <b>Permissions</b> or <b>Site settings</b></li>' +
-        '<li>Set <b>Camera</b> to <b>Allow</b></li>' +
-        '<li>Tap <b>TRY AGAIN</b> below</li>' +
-        '</ol>'
-      );
-      break;
-    case 'NotFoundError':
-      showStatus('err', '📷 No Camera Found',
-        'No camera was detected on this device. Make sure your tablet\'s camera is working.'
-      );
-      break;
-    case 'NotReadableError':
-      showStatus('warn', '⚠️ Camera In Use',
-        'Another app is using the camera. <b>Close other camera apps</b> and try again.'
-      );
-      break;
-    case 'SecurityError':
-      showStatus('err', '🔒 Secure Context Required',
-        'Camera access requires HTTPS or localhost.<br>' +
-        '<div class="serve-tip">' +
-        '<b>Quick fix:</b> Serve this file from your laptop:' +
-        '<ol><li>Run: <code>python3 -m http.server 8080</code></li>' +
-        '<li>Open <code>http://YOUR_LAPTOP_IP:8080/photobooth.html</code> on the tablet</li></ol>' +
-        '</div>'
-      );
-      break;
-    default:
-      showStatus('err', '❌ Camera Error',
-        '<b>' + err.name + '</b>: ' + err.message + '<br><br>' +
-        'Try closing other apps, restarting Chrome, or restarting the tablet.'
-      );
-  }
-}
-
-// ─── Filter / Layout ────────────────────────────────────
-function setF(btn) {
-  document.querySelectorAll('.fb').forEach(function(b) { b.classList.remove('on'); });
-  btn.classList.add('on');
-  curFilter = btn.dataset.f;
-  vid.className = 'f-' + curFilter;
-}
-
-function setLayout(l) {
-  layout = l;
-  ['bstrip','bgrid'].forEach(function(id) {
-    document.getElementById(id).classList.toggle('on', (id === 'bstrip') === (l === 'strip'));
-  });
-  ['dl-strip','dl-grid'].forEach(function(id) {
-    document.getElementById(id).classList.toggle('on', (id === 'dl-strip') === (l === 'strip'));
-  });
-}
-
-function flipCam() {
-  facing = (facing === 'user') ? 'environment' : 'user';
-  vid.style.transform = (facing === 'user') ? 'scaleX(-1)' : 'scaleX(1)';
-  if (myStream) myStream.getTracks().forEach(function(t) { t.stop(); });
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: facing }, audio: false })
-    .then(function(s) {
-      myStream = s;
-      vid.srcObject = s;
-      vid.onloadedmetadata = function() { vid.play(); };
-    }).catch(function(e) { console.error('flip', e); });
-}
-
-// ─── Dots ───────────────────────────────────────────────
-function updateDots() {
-  for (var i = 0; i < 4; i++) {
-    var d = document.getElementById('d' + i);
-    d.className = 'dot';
-    if (i < photos.length)                d.classList.add('lit');
-    else if (i === photos.length && busy) d.classList.add('live');
-  }
-}
-
-// ─── Countdown ──────────────────────────────────────────
-function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
-
-function doCountdown() {
-  var label = document.querySelector('.cdown-label');
-  var readyMsgs = ['Say cheese! 🧀', 'Get ready! 📸', 'Strike a pose! 💃', 'Smile big! 😄'];
-  return new Promise(function(resolve) {
-    cdown.classList.add('show');
-    if (label) label.textContent = readyMsgs[photos.length] || readyMsgs[0];
-    var n = 3;
-    function tick() {
-      cnum.textContent = n;
-      cnum.classList.remove('pop');
-      void cnum.offsetWidth;
-      cnum.classList.add('pop');
-      if (n <= 1) {
-        setTimeout(function() { cdown.classList.remove('show'); resolve(); }, 880);
-        return;
-      }
-      n--;
-      setTimeout(tick, 960);
-    }
-    tick();
-  });
-}
-
-// ─── Capture ────────────────────────────────────────────
-// Use Blob URLs instead of data URLs — Android Chrome can't handle
-// multi-MB base64 strings when loading them back as Image src.
-var MAX_CAP = 1280; // cap longest edge for Android perf
-
-function grabFrame() {
-  return new Promise(function(resolve) {
-    flash.classList.remove('go');
-    void flash.offsetWidth;
-    flash.classList.add('go');
-
-    var vw = vid.videoWidth, vh = vid.videoHeight;
-    if (!vw || !vh) { resolve(null); return; }
-
-    // Scale down if needed to stay within budget
-    var scale = 1;
-    if (Math.max(vw, vh) > MAX_CAP) {
-      scale = MAX_CAP / Math.max(vw, vh);
-    }
-    var w = Math.round(vw * scale);
-    var h = Math.round(vh * scale);
-
-    var c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    var ctx = c.getContext('2d');
-
-    // Apply filter — ctx.filter supported in Chrome 52+
-    var filterStr = CSS_FILTERS[curFilter] || 'none';
-    if (typeof ctx.filter !== 'undefined') {
-      ctx.filter = filterStr;
-    }
-
-    if (facing === 'user') { ctx.translate(w, 0); ctx.scale(-1, 1); }
-    ctx.drawImage(vid, 0, 0, w, h);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    if (typeof ctx.filter !== 'undefined') ctx.filter = 'none';
-
-    // Vignette
-    var vg = ctx.createRadialGradient(w / 2, h / 2, h * .26, w / 2, h / 2, h * .72);
-    vg.addColorStop(0, 'rgba(0,0,0,0)');
-    vg.addColorStop(1, 'rgba(0,0,0,.44)');
-    ctx.fillStyle = vg;
-    ctx.fillRect(0, 0, w, h);
-
-    // Convert to Blob URL (much lighter than dataURL on Android)
-    try {
-      c.toBlob(function(blob) {
-        if (!blob) {
-          // Fallback to dataURL if toBlob fails
-          try { resolve(c.toDataURL('image/jpeg', 0.88)); }
-          catch(e2) { resolve(null); }
-          return;
-        }
-        var url = URL.createObjectURL(blob);
-        resolve(url);
-      }, 'image/jpeg', 0.88);
-    } catch(e) {
-      // toBlob not supported — fallback
-      try { resolve(c.toDataURL('image/jpeg', 0.88)); }
-      catch(e2) { console.error(e2); resolve(null); }
-    }
-  });
-}
-
-// ─── Shoot session ──────────────────────────────────────
-async function shoot() {
-  if (busy || !myStream) return;
-  if (photos.length >= 4) { openDecorate(); return; }
-
-  busy = true;
-  shutbtn.classList.add('busy');
-
-  while (photos.length < 4) {
-    updateDots();
-    await doCountdown();
-    var url = await grabFrame();
-    if (url) photos.push(url);
-    updateDots();
-    await sleep(380);
-  }
-
-  busy = false;
-  shutbtn.classList.remove('busy');
-  updateDots();
-  viewbtn.style.display = 'block';
-  openDecorate();
-}
-
-// ─── Decorate modal ─────────────────────────────────────
-var decCanvases = [
-  document.getElementById('dc0'),
-  document.getElementById('dc1'),
-  document.getElementById('dc2'),
-  document.getElementById('dc3')
-];
-
-function openDecorate() {
-  if (!photos.length) return;
-  document.getElementById('dec').classList.add('open');
-  // Longer delay for Android — layout must be fully painted before we measure
-  setTimeout(function() {
-    for (var i = 0; i < photos.length; i++) renderCanvas(i);
-  }, 200);
-}
-
-function renderCanvas(idx) {
-  var c = decCanvases[idx];
-  if (!c || !photos[idx]) return;
-
-  var rect = c.parentElement.getBoundingClientRect();
-  var dpr  = Math.min(window.devicePixelRatio || 1, 2);
-  var cw   = Math.floor(rect.width * dpr);
-  var ch   = Math.floor(rect.height * dpr);
-  if (cw < 2 || ch < 2) return;
-
-  c.width  = cw;
-  c.height = ch;
-
-  var ctx = c.getContext('2d');
-
-  // Dark background for letterbox areas
-  ctx.fillStyle = '#0a0a0a';
-  ctx.fillRect(0, 0, cw, ch);
-
-  var img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = function() {
-    var iw = img.naturalWidth, ih = img.naturalHeight;
-    // contain-fit: use Math.min so the whole image is visible
-    var scale = Math.min(cw / iw, ch / ih);
-    var dw = iw * scale, dh = ih * scale;
-    ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
-    drawStickers(ctx, idx, cw, ch);
-  };
-  img.onerror = function() {
-    console.warn('renderCanvas: image load failed for photo', idx);
-    ctx.fillStyle = '#4a8068';
-    ctx.font = (Math.min(cw, ch) * 0.15) + 'px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('📷', cw / 2, ch / 2);
-  };
-  img.src = photos[idx];
-}
-
-function drawStickers(ctx, idx, w, h) {
-  var stks = layers[idx];
-  for (var i = 0; i < stks.length; i++) {
-    var s = stks[i];
-    var x    = s.xf * w;
-    var y    = s.yf * h;
-    var size = s.sf * Math.min(w, h);
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(s.r * Math.PI / 180);
-    ctx.font = size + 'px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(s.e, 0, 0);
-    ctx.restore();
-  }
-}
-
-// ─── Stickers ───────────────────────────────────────────
-function addSticker(emoji) {
-  for (var i = 0; i < 4; i++) {
-    if (!photos[i]) continue;
-    layers[i].push({
-      e:  emoji,
-      xf: 0.1 + Math.random() * 0.8,
-      yf: 0.1 + Math.random() * 0.8,
-      sf: 0.08 + Math.random() * 0.09,
-      r:  (Math.random() - 0.5) * 52
-    });
-    renderCanvas(i);
-  }
-  document.querySelectorAll('.dc').forEach(function(el) {
-    el.classList.add('tapped');
-    setTimeout(function() { el.classList.remove('tapped'); }, 320);
-  });
-}
-
-var ALL_STICKERS = ['🌙','⭐','🌟','✨','🕌','🪔','🌺','💫','🎉','🎊','🎈','👑','🦋','🌈','🥳','🤩','😄','🎁','🌸'];
-function surprise() {
-  var count = 3 + Math.floor(Math.random() * 4);
-  for (var s = 0; s < count; s++) {
-    var emoji = ALL_STICKERS[Math.floor(Math.random() * ALL_STICKERS.length)];
-    for (var i = 0; i < 4; i++) {
-      if (!photos[i]) continue;
-      layers[i].push({
-        e:  emoji,
-        xf: 0.08 + Math.random() * 0.84,
-        yf: 0.08 + Math.random() * 0.84,
-        sf: 0.07 + Math.random() * 0.1,
-        r:  (Math.random() - 0.5) * 60
-      });
-    }
-  }
-  for (var j = 0; j < 4; j++) renderCanvas(j);
-}
-
-function clearStickers() {
-  layers = [[], [], [], []];
-  for (var i = 0; i < 4; i++) renderCanvas(i);
-}
-
-// ─── Save strip ─────────────────────────────────────────
-function saveStrip() {
-  if (!photos.length) return;
-  var isGrid = layout === 'grid';
-  var imgs = [], loaded = 0, failed = 0;
-  photos.forEach(function(url, i) {
-    var img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function() {
-      imgs[i] = img; loaded++;
-      if (loaded + failed === photos.length && loaded > 0) compose(imgs, isGrid);
-    };
-    img.onerror = function() {
-      console.warn('saveStrip: failed to load photo', i);
-      failed++;
-      if (loaded + failed === photos.length && loaded > 0) compose(imgs, isGrid);
-    };
-    img.src = url;
-  });
-}
-
-function compose(imgs, isGrid) {
-  var pad   = 48;
-  var gap   = 14;
-  var headH = 90;
-  var footH = 44;
-
-  var pw = imgs[0].naturalWidth;
-  var ph = imgs[0].naturalHeight;
-
-  var cols   = isGrid ? 2 : 1;
-  var rows   = isGrid ? 2 : 4;
-  var cellW  = isGrid ? Math.floor((1000 - pad * 2 - gap) / 2) : 900 - pad * 2;
-  var cellH  = Math.round(cellW * ph / pw);
-  var canW   = pad * 2 + cellW * cols + gap * (cols - 1);
-  var canH   = pad + headH + cellH * rows + gap * (rows - 1) + footH + pad / 2;
-
-  var c   = document.createElement('canvas');
-  c.width = canW; c.height = canH;
-  var ctx = c.getContext('2d');
-
-  // Paper bg
-  ctx.fillStyle = '#fffaee';
-  ctx.fillRect(0, 0, canW, canH);
-
-  // Dot pattern
-  ctx.fillStyle = 'rgba(245,197,64,.1)';
-  for (var gx = 20; gx < canW; gx += 32) {
-    for (var gy = 20; gy < canH; gy += 32) {
-      ctx.beginPath(); ctx.arc(gx, gy, 2, 0, Math.PI * 2); ctx.fill();
-    }
-  }
-
-  // Border lines
-  ctx.fillStyle = '#c8880c';
-  ctx.fillRect(0, 0, canW, 4);
-  ctx.fillRect(0, canH - 4, canW, 4);
-
-  // Title
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#061c14';
-  ctx.font = 'bold ' + Math.round(canW * 0.048) + 'px "Baloo 2", sans-serif';
-  ctx.fillText('\u{1F319} Eid Mubarak! \u{1F319}', canW / 2, pad + Math.round(headH * 0.52));
-  ctx.font = Math.round(canW * 0.024) + 'px "Nunito", sans-serif';
-  ctx.fillStyle = '#4a8068';
-  ctx.fillText('Photo Booth Memories \u2728', canW / 2, pad + Math.round(headH * 0.82));
-
-  // Photos + stickers
-  imgs.forEach(function(img, i) {
-    var col = isGrid ? i % 2 : 0;
-    var row = isGrid ? Math.floor(i / 2) : i;
-    var ox  = pad + col * (cellW + gap);
-    var oy  = pad + headH + row * (cellH + gap);
-
-    ctx.save();
-    roundRect(ctx, ox, oy, cellW, cellH, 10);
-    ctx.clip();
-    ctx.drawImage(img, ox, oy, cellW, cellH);
-    ctx.restore();
-
-    ctx.strokeStyle = 'rgba(200,136,12,.35)';
-    ctx.lineWidth = 2;
-    roundRect(ctx, ox, oy, cellW, cellH, 10);
-    ctx.stroke();
-
-    layers[i].forEach(function(s) {
-      var sx   = ox + s.xf * cellW;
-      var sy   = oy + s.yf * cellH;
-      var size = s.sf * Math.min(cellW, cellH);
-      ctx.save();
-      ctx.translate(sx, sy);
-      ctx.rotate(s.r * Math.PI / 180);
-      ctx.font = size + 'px serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(s.e, 0, 0);
-      ctx.restore();
-    });
-  });
-
-  // Date footer
-  ctx.textAlign = 'center';
-  ctx.font = Math.round(canW * 0.018) + 'px "Nunito", sans-serif';
-  ctx.fillStyle = '#8aaa90';
-  var now = new Date();
-  ctx.fillText(
-    now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase(),
-    canW / 2, canH - pad / 2 - 6
-  );
-
-  // Save to gallery (IndexedDB) + optionally share
-  try {
-    c.toBlob(function(blob) {
-      if (!blob) return;
-      saveToGallery(blob, function() {
-        toast.classList.add('show');
-        setTimeout(function() { toast.classList.remove('show'); }, 3000);
-      });
-
-      // Also trigger download as backup
-      var blobUrl = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.download = 'eid-photo-booth-' + Date.now() + '.jpg';
-      a.href = blobUrl;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 2000);
-    }, 'image/jpeg', 0.93);
-  } catch(e) {
-    console.error('compose save error', e);
-  }
-}
-
-// Compose and share (native share sheet)
-var pendingShare = false;
-function saveAndShare() {
-  if (!photos.length) return;
-  pendingShare = true;
-  saveStrip();
-}
-
-function doDataUrlDownload(canvas) {
-  var a = document.createElement('a');
-  a.download = 'eid-photo-booth-' + Date.now() + '.jpg';
-  a.href = canvas.toDataURL('image/jpeg', 0.93);
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  toast.classList.add('show');
-  setTimeout(function() { toast.classList.remove('show'); }, 3000);
-}
-
-// ─── Web Share API ──────────────────────────────────────
-function nativeShare(blob, filename) {
-  filename = filename || 'eid-photo-booth.jpg';
-  if (navigator.share && navigator.canShare) {
-    var file = new File([blob], filename, { type: 'image/jpeg' });
-    var shareData = { files: [file], title: 'Eid Mubarak Photo Booth', text: 'Check out our Eid photos! 🌙✨' };
-    if (navigator.canShare(shareData)) {
-      navigator.share(shareData).catch(function(e) {
-        if (e.name !== 'AbortError') console.warn('Share failed:', e);
-      });
-      return;
-    }
-  }
-  // Fallback: download
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.download = filename;
-  a.href = url;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
-}
-
-// ─── IndexedDB Gallery ──────────────────────────────────
-var DB_NAME = 'eid-booth-gallery';
-var DB_VERSION = 1;
-var STORE_NAME = 'strips';
-
-function openDB(cb) {
-  var req = indexedDB.open(DB_NAME, DB_VERSION);
-  req.onupgradeneeded = function(e) {
-    var db = e.target.result;
-    if (!db.objectStoreNames.contains(STORE_NAME)) {
-      db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-    }
-  };
-  req.onsuccess = function(e) { cb(null, e.target.result); };
-  req.onerror = function(e) { cb(e.target.error, null); };
-}
-
-function saveToGallery(blob, done) {
-  openDB(function(err, db) {
-    if (err || !db) { if (done) done(); return; }
-    var tx = db.transaction(STORE_NAME, 'readwrite');
-    var store = tx.objectStore(STORE_NAME);
-    store.add({ blob: blob, time: Date.now() });
-    tx.oncomplete = function() {
-      updateGalleryCount();
-      if (pendingShare) {
-        pendingShare = false;
-        nativeShare(blob, 'eid-photo-booth-' + Date.now() + '.jpg');
-      }
-      if (done) done();
-    };
-    tx.onerror = function() { if (done) done(); };
-  });
-}
-
-function getAllFromGallery(cb) {
-  openDB(function(err, db) {
-    if (err || !db) { cb([]); return; }
-    var tx = db.transaction(STORE_NAME, 'readonly');
-    var store = tx.objectStore(STORE_NAME);
-    var req = store.getAll();
-    req.onsuccess = function() { cb(req.result || []); };
-    req.onerror = function() { cb([]); };
-  });
-}
-
-function deleteFromGallery(id, cb) {
-  openDB(function(err, db) {
-    if (err || !db) { if (cb) cb(); return; }
-    var tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).delete(id);
-    tx.oncomplete = function() { updateGalleryCount(); if (cb) cb(); };
-    tx.onerror = function() { if (cb) cb(); };
-  });
-}
-
-function updateGalleryCount() {
-  openDB(function(err, db) {
-    if (err || !db) return;
-    var tx = db.transaction(STORE_NAME, 'readonly');
-    var req = tx.objectStore(STORE_NAME).count();
-    req.onsuccess = function() {
-      var el = document.getElementById('gal-count');
-      if (el) el.textContent = req.result || 0;
-    };
-  });
-}
-
-// Init count on load
+// ─── IndexedDB ──────────────────────────────────────────
+var DB='eid-booth-gallery',VER=1,ST='strips';
+function odb(cb){var r=indexedDB.open(DB,VER);r.onupgradeneeded=function(e){var d=e.target.result;if(!d.objectStoreNames.contains(ST))d.createObjectStore(ST,{keyPath:'id',autoIncrement:true});};r.onsuccess=function(e){cb(null,e.target.result);};r.onerror=function(e){cb(e.target.error,null);};}
+function saveToGallery(blob,done){odb(function(err,db){if(err||!db){if(done)done();return;}var tx=db.transaction(ST,'readwrite');tx.objectStore(ST).add({blob:blob,time:Date.now()});tx.oncomplete=function(){updateGalleryCount();if(done)done();};tx.onerror=function(){if(done)done();};});}
+function getAllFromGallery(cb){odb(function(err,db){if(err||!db){cb([]);return;}var tx=db.transaction(ST,'readonly');var req=tx.objectStore(ST).getAll();req.onsuccess=function(){cb(req.result||[]);};req.onerror=function(){cb([]);};});}
+function deleteFromGallery(id,cb){odb(function(err,db){if(err||!db){if(cb)cb();return;}var tx=db.transaction(ST,'readwrite');tx.objectStore(ST).delete(id);tx.oncomplete=function(){updateGalleryCount();if(cb)cb();};tx.onerror=function(){if(cb)cb();};});}
+function updateGalleryCount(){odb(function(err,db){if(err||!db)return;var tx=db.transaction(ST,'readonly');var req=tx.objectStore(ST).count();req.onsuccess=function(){var el=document.getElementById('gal-count');if(el)el.textContent=req.result||0;};});}
 updateGalleryCount();
 
-// ─── Gallery UI ─────────────────────────────────────────
-function openGallery() {
-  document.getElementById('gallery').classList.add('open');
-  renderGallery();
-}
-function closeGallery() {
-  document.getElementById('gallery').classList.remove('open');
-  // Revoke any blob URLs we created for thumbnails
-  galBlobUrls.forEach(function(u) { try { URL.revokeObjectURL(u); } catch(e){} });
-  galBlobUrls = [];
-}
-
-var galBlobUrls = [];
-function renderGallery() {
-  var grid = document.getElementById('gal-grid');
-  grid.innerHTML = '<div class="gal-empty"><span class="gal-empty-icon">📸</span><span class="gal-empty-text">Loading...</span></div>';
-
-  getAllFromGallery(function(items) {
-    // Clean up previous blob URLs
-    galBlobUrls.forEach(function(u) { try { URL.revokeObjectURL(u); } catch(e){} });
-    galBlobUrls = [];
-
-    if (!items.length) {
-      grid.innerHTML = '<div class="gal-empty"><span class="gal-empty-icon">📸</span><span class="gal-empty-text">No photos yet!<br>Take some photos and tap Save.</span></div>';
-      return;
-    }
-
-    // Sort newest first
-    items.sort(function(a, b) { return b.time - a.time; });
-
-    grid.innerHTML = '';
-    items.forEach(function(item) {
-      var url = URL.createObjectURL(item.blob);
-      galBlobUrls.push(url);
-
-      var d = new Date(item.time);
-      var timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-
-      var div = document.createElement('div');
-      div.className = 'gal-item';
-      div.innerHTML =
-        '<img src="' + url + '">' +
-        '<span class="gal-item-time">' + timeStr + '</span>' +
-        '<div class="gal-item-actions">' +
-        '<button class="gal-item-btn gal-share" data-id="' + item.id + '">📤 Share</button>' +
-        '<button class="gal-item-btn gal-del" data-id="' + item.id + '">🗑</button>' +
-        '</div>';
-
-      // Tap image to preview full screen
-      div.querySelector('img').onclick = function(e) {
-        e.stopPropagation();
-        openPreview(item.id, url, item.blob);
-      };
-      div.querySelector('.gal-share').onclick = function(e) {
-        e.stopPropagation();
-        nativeShare(item.blob, 'eid-photo-' + item.id + '.jpg');
-      };
-      div.querySelector('.gal-del').onclick = function(e) {
-        e.stopPropagation();
-        deleteFromGallery(item.id, function() { renderGallery(); });
-      };
-
-      grid.appendChild(div);
+function openGallery(){document.getElementById('gallery').classList.add('open');renderGallery();}
+function closeGallery(){document.getElementById('gallery').classList.remove('open');galUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}});galUrls=[];}
+var galUrls=[];
+function renderGallery(){
+  var g=document.getElementById('gal-grid');
+  g.innerHTML='<div class="gal-empty"><span class="gal-empty-icon">📸</span><span class="gal-empty-text">Loading...</span></div>';
+  getAllFromGallery(function(items){
+    galUrls.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}});galUrls=[];
+    if(!items.length){g.innerHTML='<div class="gal-empty"><span class="gal-empty-icon">📸</span><span class="gal-empty-text">No photos yet!<br>Take some photos and tap Save.</span></div>';return;}
+    items.sort(function(a,b){return b.time-a.time;});g.innerHTML='';
+    items.forEach(function(item){
+      var url=URL.createObjectURL(item.blob);galUrls.push(url);
+      var d=new Date(item.time),ts=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+      var div=document.createElement('div');div.className='gal-item';
+      div.innerHTML='<img src="'+url+'"><div class="gal-item-overlay"><span class="gal-item-time">'+ts+'</span><button class="gal-del-btn">🗑 Delete</button></div>';
+      div.querySelector('img').onclick=function(e){e.stopPropagation();openPreview(item.id,url);};
+      div.querySelector('.gal-del-btn').onclick=function(e){e.stopPropagation();deleteFromGallery(item.id,function(){renderGallery();});};
+      g.appendChild(div);
     });
   });
 }
 
-// ─── Preview (fullscreen single image) ──────────────────
-var previewCurrent = { id: null, blob: null };
+var prevCur={id:null};
+function openPreview(id,url){prevCur={id:id};document.getElementById('preview-img').src=url;document.getElementById('preview').classList.add('open');}
+function closePreview(){document.getElementById('preview').classList.remove('open');prevCur={id:null};}
+function deletePreview(){if(prevCur.id!=null)deleteFromGallery(prevCur.id,function(){closePreview();renderGallery();});}
 
-function openPreview(id, url, blob) {
-  previewCurrent = { id: id, blob: blob };
-  document.getElementById('preview-img').src = url;
-  document.getElementById('preview').classList.add('open');
-}
-function closePreview() {
-  document.getElementById('preview').classList.remove('open');
-  previewCurrent = { id: null, blob: null };
-}
-function sharePreview() {
-  if (previewCurrent.blob) {
-    nativeShare(previewCurrent.blob, 'eid-photo-' + previewCurrent.id + '.jpg');
-  }
-}
-function deletePreview() {
-  if (previewCurrent.id != null) {
-    deleteFromGallery(previewCurrent.id, function() {
-      closePreview();
-      renderGallery();
-    });
-  }
-}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
 
-// ─── PWA Service Worker ─────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(function() {
-    // SW not found — that's fine, app still works
-  });
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
-
-// ─── Reset ──────────────────────────────────────────────
-function resetAll() {
-  // Revoke blob URLs to free memory
-  photos.forEach(function(url) {
-    if (url && url.indexOf('blob:') === 0) {
-      try { URL.revokeObjectURL(url); } catch(e) {}
-    }
-  });
-  photos = []; layers = [[], [], [], []]; busy = false;
-  shutbtn.classList.remove('busy');
-  viewbtn.style.display = 'none';
-  updateDots();
-  document.getElementById('dec').classList.remove('open');
-}
+function resetAll(){photos.forEach(function(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u);}catch(e){}});photos=[];layers=[[],[],[],[]];busy=false;shutbtn.classList.remove('busy');viewbtn.style.display='none';updateDots();document.getElementById('dec').classList.remove('open');}
 </script>
 </body>
 </html>
