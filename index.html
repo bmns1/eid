@@ -43,6 +43,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:6px
 /* ── VIEWFINDER — max space ── */
 #vf{flex:1;position:relative;overflow:hidden;background:#111}
 #vid{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}
+#fx-canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;pointer-events:none;display:none}
 #vid.f-sunny{filter:none}#vid.f-moon{filter:grayscale(1) contrast(1.1)}#vid.f-golden{filter:sepia(.45) saturate(1.35) brightness(1.06)}#vid.f-twilight{filter:hue-rotate(195deg) saturate(.9) brightness(1.04)}#vid.f-vintage{filter:sepia(.65) contrast(.88) brightness(.94) saturate(.75)}#vid.f-festival{filter:contrast(1.45) saturate(1.4) brightness(.88)}#vid.f-glow{filter:brightness(1.15) saturate(1.4) contrast(1.1)}#vid.f-invert{filter:invert(1) hue-rotate(180deg)}#vid.f-mirror{filter:none}#vid.f-pixel{filter:none}
 
 /* Countdown */
@@ -222,6 +223,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:6px
 
   <div id="vf">
     <video id="vid" autoplay playsinline muted class="f-sunny"></video>
+    <canvas id="fx-canvas"></canvas>
     <div id="cdown"><span id="cnum">3</span><div class="cdown-label">Get ready!</div></div>
     <div id="flash"></div>
   </div>
@@ -332,6 +334,7 @@ function resetIdleTimer(){
 }
 function goToSleep(){
   // Stop camera
+  stopFxLoop();
   if(myStream){myStream.getTracks().forEach(function(t){t.stop();});myStream=null;}
   vid.srcObject=null;
   // Close any open modals
@@ -341,6 +344,9 @@ function goToSleep(){
   // Reset state
   photos.forEach(function(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u);}catch(e){}});
   photos=[];layers=[[],[],[],[]];photoImgs=[null,null,null,null];drawStrokes=[];drawMode=false;busy=false;
+  curFilter='sunny';vid.className='f-sunny';
+  document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('on');});
+  var firstFb=document.querySelector('.fb[data-f="sunny"]');if(firstFb)firstFb.classList.add('on');
   var dt=document.getElementById('draw-toggle');if(dt)dt.classList.remove('active');
   shutbtn.classList.remove('busy');viewbtn.style.display='none';updateDots();
   // Show splash
@@ -360,11 +366,69 @@ function startCam(){gobtn.disabled=true;gobtn.textContent='STARTING...';statusCa
 function camOk(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play().then(function(){document.getElementById('splash').style.display='none';resetIdleTimer();}).catch(function(){document.getElementById('splash').style.display='none';resetIdleTimer();});};setTimeout(function(){document.getElementById('splash').style.display='none';resetIdleTimer();},3000);}
 function camFail(e){gobtn.disabled=false;gobtn.textContent='TRY AGAIN ✨';var m={'NotAllowedError':['🚫 Permission Denied','Tap <b>🔒 lock icon</b> → Permissions → Camera → <b>Allow</b> → TRY AGAIN.'],'NotFoundError':['📷 No Camera','No camera detected.'],'NotReadableError':['⚠️ Camera Busy','Close other camera apps.'],'SecurityError':['🔒 Needs HTTPS','<div class="serve-tip">Run <code>python3 -m http.server 8080</code> on laptop.</div>']};var p=m[e.name];if(p)showStatus('err',p[0],p[1]);else showStatus('err','❌ Error','<b>'+e.name+'</b>: '+e.message);}
 
-function setF(b){document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');curFilter=b.dataset.f;vid.className='f-'+curFilter;}
+function setF(b){document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');curFilter=b.dataset.f;vid.className='f-'+curFilter;
+  // Start/stop live FX canvas for special filters
+  if(curFilter==='mirror'||curFilter==='pixel'){startFxLoop();}else{stopFxLoop();}
+}
+
+// ─── Live FX canvas loop (for mirror & pixel) ──────────
+var fxCanvas=document.getElementById('fx-canvas');
+var fxCtx=fxCanvas.getContext('2d');
+var fxRaf=null;
+function startFxLoop(){
+  fxCanvas.style.display='block';
+  if(fxRaf)return; // already running
+  function tick(){
+    if(!myStream||vid.videoWidth<2){fxRaf=requestAnimationFrame(tick);return;}
+    var vw=vid.videoWidth,vh=vid.videoHeight;
+    var rect=fxCanvas.parentElement.getBoundingClientRect();
+    // Size canvas to display size (no need for hi-res here, perf matters)
+    if(fxCanvas.width!==Math.floor(rect.width)||fxCanvas.height!==Math.floor(rect.height)){
+      fxCanvas.width=Math.floor(rect.width);fxCanvas.height=Math.floor(rect.height);
+    }
+    var w=fxCanvas.width,h=fxCanvas.height;
+    fxCtx.clearRect(0,0,w,h);
+
+    if(curFilter==='mirror'){
+      // Draw full frame mirrored (like selfie cam)
+      fxCtx.save();
+      if(facing==='user'){fxCtx.translate(w,0);fxCtx.scale(-1,1);}
+      fxCtx.drawImage(vid,0,0,w,h);
+      fxCtx.restore();
+      // Now mirror: copy left half, draw it flipped onto right half
+      var half=Math.floor(w/2);
+      var tmp=document.createElement('canvas');tmp.width=half;tmp.height=h;
+      tmp.getContext('2d').drawImage(fxCanvas,0,0,half,h,0,0,half,h);
+      fxCtx.save();fxCtx.translate(w,0);fxCtx.scale(-1,1);
+      fxCtx.drawImage(tmp,0,0,half,h,0,0,half,h);
+      fxCtx.restore();
+    }else if(curFilter==='pixel'){
+      var pxSize=10;
+      var sw=Math.floor(w/pxSize),sh=Math.floor(h/pxSize);
+      var tmp=document.createElement('canvas');tmp.width=sw;tmp.height=sh;
+      var tctx=tmp.getContext('2d');
+      // Draw video to tiny canvas (auto-downscales)
+      tctx.save();
+      if(facing==='user'){tctx.translate(sw,0);tctx.scale(-1,1);}
+      tctx.drawImage(vid,0,0,sw,sh);
+      tctx.restore();
+      // Draw tiny canvas back at full size with no smoothing = pixelated
+      fxCtx.imageSmoothingEnabled=false;
+      fxCtx.drawImage(tmp,0,0,sw,sh,0,0,w,h);
+      fxCtx.imageSmoothingEnabled=true;
+    }
+    fxRaf=requestAnimationFrame(tick);
+  }
+  fxRaf=requestAnimationFrame(tick);
+}
+function stopFxLoop(){
+  if(fxRaf){cancelAnimationFrame(fxRaf);fxRaf=null;}
+  fxCanvas.style.display='none';
+}
 function flipCam(){facing=(facing==='user')?'environment':'user';vid.style.transform=(facing==='user')?'scaleX(-1)':'scaleX(1)';if(myStream)myStream.getTracks().forEach(function(t){t.stop();});navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false}).then(function(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play();};}).catch(function(e){console.error('flip',e);});}
 function updateDots(){for(var i=0;i<4;i++){var d=document.getElementById('d'+i);d.className='dot';if(i<photos.length)d.classList.add('lit');else if(i===photos.length&&busy)d.classList.add('live');}}
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
-function doCountdown(){var lbl=document.querySelector('.cdown-label'),msgs=['Say cheese! 🧀','Get ready! 📸','Strike a pose! 💃','Smile big! 😄'];return new Promise(function(res){cdown.classList.add('show');if(lbl)lbl.textContent=msgs[photos.length]||msgs[0];var n=3;function tick(){cnum.textContent=n;cnum.classList.remove('pop');void cnum.offsetWidth;cnum.classList.add('pop');if(n<=1){setTimeout(function(){cdown.classList.remove('show');res();},880);return;}n--;setTimeout(tick,960);}tick();});}
+function doCountdown(){var lbl=document.querySelector('.cdown-label'),msgs=['Say cheese! 🧀','Get ready! 📸','MashaAllah!','Smile big! 😄'];return new Promise(function(res){cdown.classList.add('show');if(lbl)lbl.textContent=msgs[photos.length]||msgs[0];var n=3;function tick(){cnum.textContent=n;cnum.classList.remove('pop');void cnum.offsetWidth;cnum.classList.add('pop');if(n<=1){setTimeout(function(){cdown.classList.remove('show');res();},880);return;}n--;setTimeout(tick,960);}tick();});}
 
 function grabFrame(){return new Promise(function(res){flash.classList.remove('go');void flash.offsetWidth;flash.classList.add('go');var vw=vid.videoWidth,vh=vid.videoHeight;if(!vw||!vh){res(null);return;}var sc=1,MAX=1280;if(Math.max(vw,vh)>MAX)sc=MAX/Math.max(vw,vh);var w=Math.round(vw*sc),h=Math.round(vh*sc);var c=document.createElement('canvas');c.width=w;c.height=h;var ctx=c.getContext('2d');
   // Apply CSS filter
@@ -378,24 +442,22 @@ function grabFrame(){return new Promise(function(res){flash.classList.remove('go
   // ── Special filter: Mirror (left half mirrored to right)
   if(curFilter==='mirror'){
     var half=Math.floor(w/2);
-    var left=ctx.getImageData(0,0,half,h);
-    // Draw left half normally, then flip it for right
-    ctx.putImageData(left,0,0);
+    var tmp=document.createElement('canvas');tmp.width=half;tmp.height=h;
+    tmp.getContext('2d').drawImage(c,0,0,half,h,0,0,half,h);
     ctx.save();ctx.translate(w,0);ctx.scale(-1,1);
-    ctx.drawImage(c,0,0,half,h,0,0,half,h);
+    ctx.drawImage(tmp,0,0,half,h,0,0,half,h);
     ctx.restore();
   }
 
   // ── Special filter: Pixelate
   if(curFilter==='pixel'){
-    var pxSize=12;
+    var pxSize=10;
     var sw=Math.floor(w/pxSize),sh=Math.floor(h/pxSize);
-    var tc=document.createElement('canvas');tc.width=sw;tc.height=sh;
-    var tctx=tc.getContext('2d');
-    tctx.drawImage(c,0,0,sw,sh);
+    var tmp=document.createElement('canvas');tmp.width=sw;tmp.height=sh;
+    tmp.getContext('2d').drawImage(c,0,0,w,h,0,0,sw,sh);
     ctx.imageSmoothingEnabled=false;
     ctx.clearRect(0,0,w,h);
-    ctx.drawImage(tc,0,0,sw,sh,0,0,w,h);
+    ctx.drawImage(tmp,0,0,sw,sh,0,0,w,h);
     ctx.imageSmoothingEnabled=true;
   }
 
@@ -469,7 +531,7 @@ function draw46(ctx,W,H){
   // Date
   ctx.fillStyle='#c8880c';
   ctx.font='700 '+Math.round(W*.028)+'px "Baloo 2",sans-serif';
-  ctx.fillText('March 30, 2026',W/2,H*.113);
+  ctx.fillText('March 20, 2026',W/2,H*.113);
   // Divider
   ctx.fillStyle='#c8880c';rr(ctx,W*.07,H*.126,W*.86,Math.max(2,H*.002),1);ctx.fill();
   // Second deco row
@@ -499,7 +561,7 @@ function draw46(ctx,W,H){
   ctx.textAlign='center';ctx.fillStyle='#c8880c';ctx.font=Math.round(W*.02)+'px serif';
   ctx.fillText('🌙  ⭐  ✨  Eid Mubarak!  ✨  ⭐  🌙',W/2,H*.96);
   ctx.fillStyle='#8aaa90';ctx.font='600 '+Math.round(W*.015)+'px "Nunito",sans-serif';
-  ctx.fillText('Photo Booth Memories',W/2,H*.98);
+  ctx.fillText('Thanks for Comming!',W/2,H*.98);
 }
 
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
@@ -664,7 +726,7 @@ function deletePreview(){if(prevCur.id!=null)deleteFromGallery(prevCur.id,functi
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
 
-function resetAll(){photos.forEach(function(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u);}catch(e){}});photos=[];layers=[[],[],[],[]];photoImgs=[null,null,null,null];drawStrokes=[];drawMode=false;var dt=document.getElementById('draw-toggle');if(dt)dt.classList.remove('active');busy=false;shutbtn.classList.remove('busy');viewbtn.style.display='none';updateDots();document.getElementById('dec').classList.remove('open');}
+function resetAll(){photos.forEach(function(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u);}catch(e){}});photos=[];layers=[[],[],[],[]];photoImgs=[null,null,null,null];drawStrokes=[];drawMode=false;stopFxLoop();curFilter='sunny';vid.className='f-sunny';document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('on');});var firstFb=document.querySelector('.fb[data-f="sunny"]');if(firstFb)firstFb.classList.add('on');var dt=document.getElementById('draw-toggle');if(dt)dt.classList.remove('active');busy=false;shutbtn.classList.remove('busy');viewbtn.style.display='none';updateDots();document.getElementById('dec').classList.remove('open');}
 </script>
 </body>
 </html>
