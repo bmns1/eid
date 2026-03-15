@@ -314,7 +314,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:6px
   </div>
 </div>
 
-<div id="toast">✅ Saved!</div>
+<div id="toast">✅ Photo saved!</div>
 
 <script>
 var vid=document.getElementById('vid'),flash=document.getElementById('flash'),cdown=document.getElementById('cdown'),cnum=document.getElementById('cnum'),shutbtn=document.getElementById('shutbtn'),viewbtn=document.getElementById('viewbtn'),statusCard=document.getElementById('status-card'),gobtn=document.getElementById('gobtn'),toast=document.getElementById('toast');
@@ -333,10 +333,9 @@ function resetIdleTimer(){
   }
 }
 function goToSleep(){
-  // Stop camera
+  // Pause camera but keep stream alive (Safari re-asks permission if you stop it)
   stopFxLoop();
-  if(myStream){myStream.getTracks().forEach(function(t){t.stop();});myStream=null;}
-  vid.srcObject=null;
+  if(myStream){myStream.getVideoTracks().forEach(function(t){t.enabled=false;});}
   // Close any open modals
   document.getElementById('dec').classList.remove('open');
   document.getElementById('gallery').classList.remove('open');
@@ -362,7 +361,19 @@ function goToSleep(){
 function showStatus(t,title,body){statusCard.className='sc-'+t+' show';statusCard.id='status-card';statusCard.innerHTML='<div class="sc-inner"><div class="sc-title">'+title+'</div><div class="sc-body">'+body+'</div></div>';}
 (function(){if(location.protocol==='file:'){showStatus('warn','⚠️ Local File','<b>Chrome blocks camera on local files.</b><div class="serve-tip"><b>Fix:</b> Run <code>python3 -m http.server 8080</code> on laptop, open <code>http://LAPTOP_IP:8080</code> on tablet.</div>');gobtn.textContent='TRY ANYWAY ✨';}if(navigator.permissions&&navigator.permissions.query){navigator.permissions.query({name:'camera'}).then(function(r){if(r.state==='denied')showStatus('err','🚫 Camera Blocked','Tap 🔒 in address bar → Site settings → Camera → <b>Allow</b> → Reload.');r.onchange=function(){if(r.state==='granted'){statusCard.className='';statusCard.innerHTML='';gobtn.disabled=false;gobtn.textContent="LET'S GO! ✨";}};}).catch(function(){});}})();
 
-function startCam(){gobtn.disabled=true;gobtn.textContent='STARTING...';statusCard.className='';statusCard.innerHTML='';if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){showStatus('err','🚫 No Camera','Use <b>Chrome</b> on your tablet.');gobtn.disabled=false;gobtn.textContent='TRY AGAIN ✨';return;}navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1280},height:{ideal:720}},audio:false}).then(camOk).catch(function(e){if(e.name==='OverconstrainedError')return navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false}).then(camOk);throw e;}).catch(camFail);}
+function startCam(){
+  gobtn.disabled=true;gobtn.textContent='STARTING...';statusCard.className='';statusCard.innerHTML='';
+  // If stream is still alive (just paused), re-enable it
+  if(myStream&&myStream.getVideoTracks().length>0&&myStream.getVideoTracks()[0].readyState==='live'){
+    myStream.getVideoTracks().forEach(function(t){t.enabled=true;});
+    vid.srcObject=myStream;
+    vid.play().then(function(){document.getElementById('splash').style.display='none';resetIdleTimer();}).catch(function(){document.getElementById('splash').style.display='none';resetIdleTimer();});
+    return;
+  }
+  // Otherwise request new stream
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){showStatus('err','🚫 No Camera','Use <b>Chrome</b> or <b>Safari</b> on your tablet.');gobtn.disabled=false;gobtn.textContent='TRY AGAIN ✨';return;}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1920},height:{ideal:1080}},audio:false}).then(camOk).catch(function(e){if(e.name==='OverconstrainedError')return navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false}).then(camOk);throw e;}).catch(camFail);
+}
 function camOk(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play().then(function(){document.getElementById('splash').style.display='none';resetIdleTimer();}).catch(function(){document.getElementById('splash').style.display='none';resetIdleTimer();});};setTimeout(function(){document.getElementById('splash').style.display='none';resetIdleTimer();},3000);}
 function camFail(e){gobtn.disabled=false;gobtn.textContent='TRY AGAIN ✨';var m={'NotAllowedError':['🚫 Permission Denied','Tap <b>🔒 lock icon</b> → Permissions → Camera → <b>Allow</b> → TRY AGAIN.'],'NotFoundError':['📷 No Camera','No camera detected.'],'NotReadableError':['⚠️ Camera Busy','Close other camera apps.'],'SecurityError':['🔒 Needs HTTPS','<div class="serve-tip">Run <code>python3 -m http.server 8080</code> on laptop.</div>']};var p=m[e.name];if(p)showStatus('err',p[0],p[1]);else showStatus('err','❌ Error','<b>'+e.name+'</b>: '+e.message);}
 
@@ -428,16 +439,63 @@ function stopFxLoop(){
 function flipCam(){facing=(facing==='user')?'environment':'user';vid.style.transform=(facing==='user')?'scaleX(-1)':'scaleX(1)';if(myStream)myStream.getTracks().forEach(function(t){t.stop();});navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false}).then(function(s){myStream=s;vid.srcObject=s;vid.onloadedmetadata=function(){vid.play();};}).catch(function(e){console.error('flip',e);});}
 function updateDots(){for(var i=0;i<4;i++){var d=document.getElementById('d'+i);d.className='dot';if(i<photos.length)d.classList.add('lit');else if(i===photos.length&&busy)d.classList.add('live');}}
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
-function doCountdown(){var lbl=document.querySelector('.cdown-label'),msgs=['Say cheese! 🧀','Get ready! 📸','MashaAllah!','Smile big! 😄'];return new Promise(function(res){cdown.classList.add('show');if(lbl)lbl.textContent=msgs[photos.length]||msgs[0];var n=3;function tick(){cnum.textContent=n;cnum.classList.remove('pop');void cnum.offsetWidth;cnum.classList.add('pop');if(n<=1){setTimeout(function(){cdown.classList.remove('show');res();},880);return;}n--;setTimeout(tick,960);}tick();});}
+function doCountdown(){var lbl=document.querySelector('.cdown-label'),msgs=['Say cheese! 🧀','Get ready! 📸','Strike a pose! 💃','Smile big! 😄'];return new Promise(function(res){cdown.classList.add('show');if(lbl)lbl.textContent=msgs[photos.length]||msgs[0];var n=3;function tick(){cnum.textContent=n;cnum.classList.remove('pop');void cnum.offsetWidth;cnum.classList.add('pop');if(n<=1){setTimeout(function(){cdown.classList.remove('show');res();},880);return;}n--;setTimeout(tick,960);}tick();});}
+
+// Detect if ctx.filter is supported (Safari doesn't support it)
+var supportsCtxFilter=(function(){var tc=document.createElement('canvas').getContext('2d');tc.filter='brightness(1)';return tc.filter==='brightness(1)';}());
+
+// Manual pixel-level filter fallback for Safari
+function applyManualFilter(ctx,w,h,filterName){
+  if(filterName==='sunny'||filterName==='mirror'||filterName==='pixel'||filterName==='glow')return; // glow is just brightness+sat, close enough raw
+  var id=ctx.getImageData(0,0,w,h);
+  var d=id.data;
+  for(var i=0;i<d.length;i+=4){
+    var r=d[i],g=d[i+1],b=d[i+2];
+    if(filterName==='moon'){
+      // Grayscale + slight contrast
+      var gray=0.299*r+0.587*g+0.114*b;
+      gray=((gray-128)*1.1)+128;
+      d[i]=d[i+1]=d[i+2]=Math.max(0,Math.min(255,gray));
+    }else if(filterName==='golden'){
+      // Sepia + warm
+      var sr=r*.55+g*.54+b*.34;
+      var sg=r*.35+g*.48+b*.26;
+      var sb=r*.27+g*.35+b*.24;
+      d[i]=Math.min(255,sr*1.35);d[i+1]=Math.min(255,sg*1.35);d[i+2]=Math.min(255,sb*1.06);
+    }else if(filterName==='twilight'){
+      // Cool blue-purple shift
+      d[i]=Math.min(255,r*.7+b*.3);d[i+1]=Math.min(255,g*.85);d[i+2]=Math.min(255,b*.7+r*.35);
+    }else if(filterName==='vintage'){
+      // Heavy sepia, low contrast
+      var vr=r*.5+g*.45+b*.3;
+      var vg=r*.35+g*.42+b*.22;
+      var vb=r*.28+g*.32+b*.2;
+      d[i]=Math.min(255,vr);d[i+1]=Math.min(255,vg);d[i+2]=Math.min(255,vb);
+    }else if(filterName==='festival'){
+      // High contrast + saturation
+      d[i]=Math.max(0,Math.min(255,((r-128)*1.45)+128));
+      d[i+1]=Math.max(0,Math.min(255,((g-128)*1.45)+128));
+      d[i+2]=Math.max(0,Math.min(255,((b-128)*1.45)+128));
+    }else if(filterName==='invert'){
+      d[i]=255-r;d[i+1]=255-g;d[i+2]=255-b;
+    }
+  }
+  ctx.putImageData(id,0,0);
+}
 
 function grabFrame(){return new Promise(function(res){flash.classList.remove('go');void flash.offsetWidth;flash.classList.add('go');var vw=vid.videoWidth,vh=vid.videoHeight;if(!vw||!vh){res(null);return;}var sc=1,MAX=1280;if(Math.max(vw,vh)>MAX)sc=MAX/Math.max(vw,vh);var w=Math.round(vw*sc),h=Math.round(vh*sc);var c=document.createElement('canvas');c.width=w;c.height=h;var ctx=c.getContext('2d');
-  // Apply CSS filter
+
+  // Apply CSS filter (Chrome/Android) or skip (Safari)
   var f=CSS_FILTERS[curFilter]||'none';
-  if(typeof ctx.filter!=='undefined'&&f!=='none')ctx.filter=f;
+  if(supportsCtxFilter&&f!=='none')ctx.filter=f;
+
   if(facing==='user'){ctx.translate(w,0);ctx.scale(-1,1);}
   ctx.drawImage(vid,0,0,w,h);
   ctx.setTransform(1,0,0,1,0,0);
-  if(typeof ctx.filter!=='undefined')ctx.filter='none';
+  if(supportsCtxFilter)ctx.filter='none';
+
+  // Safari fallback: manual pixel filter
+  if(!supportsCtxFilter){applyManualFilter(ctx,w,h,curFilter);}
 
   // ── Special filter: Mirror (left half mirrored to right)
   if(curFilter==='mirror'){
@@ -531,7 +589,7 @@ function draw46(ctx,W,H){
   // Date
   ctx.fillStyle='#c8880c';
   ctx.font='700 '+Math.round(W*.028)+'px "Baloo 2",sans-serif';
-  ctx.fillText('March 20, 2026',W/2,H*.113);
+  ctx.fillText('March 30, 2026',W/2,H*.113);
   // Divider
   ctx.fillStyle='#c8880c';rr(ctx,W*.07,H*.126,W*.86,Math.max(2,H*.002),1);ctx.fill();
   // Second deco row
@@ -561,7 +619,7 @@ function draw46(ctx,W,H){
   ctx.textAlign='center';ctx.fillStyle='#c8880c';ctx.font=Math.round(W*.02)+'px serif';
   ctx.fillText('🌙  ⭐  ✨  Eid Mubarak!  ✨  ⭐  🌙',W/2,H*.96);
   ctx.fillStyle='#8aaa90';ctx.font='600 '+Math.round(W*.015)+'px "Nunito",sans-serif';
-  ctx.fillText('Thanks for Comming!',W/2,H*.98);
+  ctx.fillText('Photo Booth Memories',W/2,H*.98);
 }
 
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
@@ -690,12 +748,32 @@ function renderAllStrokes(ctx,W,H){
   ctx.restore();
 }
 
+// Detect Safari (no ctx.filter support = Safari, or check UA)
+var isSafari=/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
 // ── Save: render at full 1200×1800 and download
 function saveStrip(){
   if(!photos.length)return;
   var c=document.createElement('canvas');c.width=1200;c.height=1800;
   draw46(c.getContext('2d'),1200,1800);
-  try{c.toBlob(function(blob){if(!blob)return;saveToGallery(blob,function(){toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},3000);});var u=URL.createObjectURL(blob);var a=document.createElement('a');a.download='eid-photo-'+Date.now()+'.jpg';a.href=u;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},2000);setTimeout(function(){goToSleep();},800);},'image/jpeg',0.95);}catch(e){console.error(e);}
+  try{c.toBlob(function(blob){
+    if(!blob)return;
+    // Always save to gallery
+    saveToGallery(blob,function(){
+      toast.classList.add('show');
+      setTimeout(function(){toast.classList.remove('show');},3000);
+    });
+    // Download only on Chrome/Android — Safari opens it in a new tab which is annoying
+    if(!isSafari){
+      var u=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.download='eid-photo-'+Date.now()+'.jpg';
+      a.href=u;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(u);},2000);
+    }
+    setTimeout(function(){goToSleep();},800);
+  },'image/jpeg',0.95);}catch(e){console.error(e);}
 }
 
 // ─── IndexedDB ──────────────────────────────────────────
