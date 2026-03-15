@@ -607,7 +607,7 @@ function startCam() {
 
   // Request camera with fallback constraints
   var constraints = {
-    video: { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1080 } },
+    video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
     audio: false
   };
 
@@ -754,24 +754,41 @@ function doCountdown() {
 }
 
 // ─── Capture ────────────────────────────────────────────
+// Use Blob URLs instead of data URLs — Android Chrome can't handle
+// multi-MB base64 strings when loading them back as Image src.
+var MAX_CAP = 1280; // cap longest edge for Android perf
+
 function grabFrame() {
   return new Promise(function(resolve) {
     flash.classList.remove('go');
     void flash.offsetWidth;
     flash.classList.add('go');
 
-    var w = vid.videoWidth, h = vid.videoHeight;
-    if (!w || !h) { resolve(null); return; }
+    var vw = vid.videoWidth, vh = vid.videoHeight;
+    if (!vw || !vh) { resolve(null); return; }
+
+    // Scale down if needed to stay within budget
+    var scale = 1;
+    if (Math.max(vw, vh) > MAX_CAP) {
+      scale = MAX_CAP / Math.max(vw, vh);
+    }
+    var w = Math.round(vw * scale);
+    var h = Math.round(vh * scale);
 
     var c = document.createElement('canvas');
     c.width = w; c.height = h;
     var ctx = c.getContext('2d');
 
-    ctx.filter = CSS_FILTERS[curFilter] || 'none';
+    // Apply filter — ctx.filter supported in Chrome 52+
+    var filterStr = CSS_FILTERS[curFilter] || 'none';
+    if (typeof ctx.filter !== 'undefined') {
+      ctx.filter = filterStr;
+    }
+
     if (facing === 'user') { ctx.translate(w, 0); ctx.scale(-1, 1); }
     ctx.drawImage(vid, 0, 0, w, h);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.filter = 'none';
+    if (typeof ctx.filter !== 'undefined') ctx.filter = 'none';
 
     // Vignette
     var vg = ctx.createRadialGradient(w / 2, h / 2, h * .26, w / 2, h / 2, h * .72);
@@ -780,17 +797,23 @@ function grabFrame() {
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, w, h);
 
-    // Film grain
-    var grain = ctx.createImageData(w, h);
-    for (var i = 0; i < grain.data.length; i += 4) {
-      var v = (Math.random() - .5) * 22;
-      grain.data[i] = grain.data[i + 1] = grain.data[i + 2] = 128 + v;
-      grain.data[i + 3] = 12;
+    // Convert to Blob URL (much lighter than dataURL on Android)
+    try {
+      c.toBlob(function(blob) {
+        if (!blob) {
+          // Fallback to dataURL if toBlob fails
+          try { resolve(c.toDataURL('image/jpeg', 0.88)); }
+          catch(e2) { resolve(null); }
+          return;
+        }
+        var url = URL.createObjectURL(blob);
+        resolve(url);
+      }, 'image/jpeg', 0.88);
+    } catch(e) {
+      // toBlob not supported — fallback
+      try { resolve(c.toDataURL('image/jpeg', 0.88)); }
+      catch(e2) { console.error(e2); resolve(null); }
     }
-    ctx.putImageData(grain, 0, 0);
-
-    try { resolve(c.toDataURL('image/jpeg', 0.92)); }
-    catch (e) { console.error(e); resolve(null); }
   });
 }
 
@@ -829,9 +852,10 @@ var decCanvases = [
 function openDecorate() {
   if (!photos.length) return;
   document.getElementById('dec').classList.add('open');
+  // Longer delay for Android — layout must be fully painted before we measure
   setTimeout(function() {
     for (var i = 0; i < photos.length; i++) renderCanvas(i);
-  }, 80);
+  }, 200);
 }
 
 function renderCanvas(idx) {
@@ -839,7 +863,7 @@ function renderCanvas(idx) {
   if (!c || !photos[idx]) return;
 
   var rect = c.parentElement.getBoundingClientRect();
-  var dpr  = window.devicePixelRatio || 1;
+  var dpr  = Math.min(window.devicePixelRatio || 1, 2); // cap DPR for Android perf
   var cw   = Math.floor(rect.width * dpr);
   var ch   = Math.floor(rect.height * dpr);
   if (cw < 2 || ch < 2) return;
@@ -849,12 +873,24 @@ function renderCanvas(idx) {
 
   var ctx = c.getContext('2d');
   var img = new Image();
+  img.crossOrigin = 'anonymous';
   img.onload = function() {
     var iw = img.naturalWidth, ih = img.naturalHeight;
     var scale = Math.max(cw / iw, ch / ih);
     var dw = iw * scale, dh = ih * scale;
     ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
     drawStickers(ctx, idx, cw, ch);
+  };
+  img.onerror = function() {
+    // Blob URL may have been revoked or failed — draw placeholder
+    console.warn('renderCanvas: image load failed for photo', idx);
+    ctx.fillStyle = '#1a2a20';
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.fillStyle = '#4a8068';
+    ctx.font = (Math.min(cw, ch) * 0.15) + 'px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('📷', cw / 2, ch / 2);
   };
   img.src = photos[idx];
 }
@@ -924,12 +960,18 @@ function clearStickers() {
 function saveStrip() {
   if (!photos.length) return;
   var isGrid = layout === 'grid';
-  var imgs = [], loaded = 0;
+  var imgs = [], loaded = 0, failed = 0;
   photos.forEach(function(url, i) {
     var img = new Image();
+    img.crossOrigin = 'anonymous';
     img.onload = function() {
       imgs[i] = img; loaded++;
-      if (loaded === photos.length) compose(imgs, isGrid);
+      if (loaded + failed === photos.length && loaded > 0) compose(imgs, isGrid);
+    };
+    img.onerror = function() {
+      console.warn('saveStrip: failed to load photo', i);
+      failed++;
+      if (loaded + failed === photos.length && loaded > 0) compose(imgs, isGrid);
     };
     img.src = url;
   });
@@ -1024,14 +1066,38 @@ function compose(imgs, isGrid) {
     canW / 2, canH - pad / 2 - 6
   );
 
-  // Download
+  // Download — use toBlob for Android compatibility
+  try {
+    c.toBlob(function(blob) {
+      if (!blob) {
+        // Fallback to dataURL
+        doDataUrlDownload(c);
+        return;
+      }
+      var blobUrl = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.download = 'eid-photo-booth-' + Date.now() + '.jpg';
+      a.href = blobUrl;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 2000);
+
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }, 'image/jpeg', 0.93);
+  } catch(e) {
+    doDataUrlDownload(c);
+  }
+}
+
+function doDataUrlDownload(canvas) {
   var a = document.createElement('a');
   a.download = 'eid-photo-booth-' + Date.now() + '.jpg';
-  a.href = c.toDataURL('image/jpeg', 0.93);
+  a.href = canvas.toDataURL('image/jpeg', 0.93);
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-
   toast.classList.add('show');
   setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
@@ -1052,6 +1118,12 @@ function roundRect(ctx, x, y, w, h, r) {
 
 // ─── Reset ──────────────────────────────────────────────
 function resetAll() {
+  // Revoke blob URLs to free memory
+  photos.forEach(function(url) {
+    if (url && url.indexOf('blob:') === 0) {
+      try { URL.revokeObjectURL(url); } catch(e) {}
+    }
+  });
   photos = []; layers = [[], [], [], []]; busy = false;
   shutbtn.classList.remove('busy');
   viewbtn.style.display = 'none';
