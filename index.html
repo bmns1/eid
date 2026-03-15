@@ -206,8 +206,8 @@ header{
 
 /* 2×2 photo grid */
 #dec-photos{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;overflow:hidden;min-height:0;}
-.dc{position:relative;border-radius:10px;overflow:hidden;background:#0a0a0a;display:flex;align-items:stretch;}
-.dc canvas{width:100%;height:100%;display:block;object-fit:cover;border-radius:10px;}
+.dc{position:relative;border-radius:10px;overflow:hidden;background:#0a0a0a;display:flex;align-items:center;justify-content:center;}
+.dc canvas{width:100%;height:100%;display:block;border-radius:10px;}
 .dc::after{content:'';position:absolute;inset:0;border-radius:10px;background:rgba(245,197,64,0);transition:background .3s;pointer-events:none;}
 .dc.tapped::after{background:rgba(245,197,64,.18)}
 
@@ -863,7 +863,7 @@ function renderCanvas(idx) {
   if (!c || !photos[idx]) return;
 
   var rect = c.parentElement.getBoundingClientRect();
-  var dpr  = Math.min(window.devicePixelRatio || 1, 2); // cap DPR for Android perf
+  var dpr  = Math.min(window.devicePixelRatio || 1, 2);
   var cw   = Math.floor(rect.width * dpr);
   var ch   = Math.floor(rect.height * dpr);
   if (cw < 2 || ch < 2) return;
@@ -872,20 +872,23 @@ function renderCanvas(idx) {
   c.height = ch;
 
   var ctx = c.getContext('2d');
+
+  // Dark background for letterbox areas
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0, 0, cw, ch);
+
   var img = new Image();
   img.crossOrigin = 'anonymous';
   img.onload = function() {
     var iw = img.naturalWidth, ih = img.naturalHeight;
-    var scale = Math.max(cw / iw, ch / ih);
+    // contain-fit: use Math.min so the whole image is visible
+    var scale = Math.min(cw / iw, ch / ih);
     var dw = iw * scale, dh = ih * scale;
     ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
     drawStickers(ctx, idx, cw, ch);
   };
   img.onerror = function() {
-    // Blob URL may have been revoked or failed — draw placeholder
     console.warn('renderCanvas: image load failed for photo', idx);
-    ctx.fillStyle = '#1a2a20';
-    ctx.fillRect(0, 0, cw, ch);
     ctx.fillStyle = '#4a8068';
     ctx.font = (Math.min(cw, ch) * 0.15) + 'px serif';
     ctx.textAlign = 'center';
