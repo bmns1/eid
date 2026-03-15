@@ -1,5 +1,5 @@
 // Eid Photo Booth Service Worker — cache-first for offline support
-var CACHE_NAME = 'eid-booth-v4';
+var CACHE_NAME = 'eid-booth-v6';
 var URLS_TO_CACHE = [
   './',
   './index.html',
